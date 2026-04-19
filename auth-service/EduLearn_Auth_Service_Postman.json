@@ -1,0 +1,185 @@
+{
+  "info": {
+    "_postman_id": "d0f1b2c4-1234-4abc-8def-9876543210ab",
+    "name": "EduLearn Auth Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"passwordHash\": \"password123\",\n  \"role\": \"STUDENT\",\n  \"provider\": \"LOCAL\",\n  \"mobile\": 9876543210,\n  \"bio\": \"Computer Science Student\",\n  \"profilePicUrl\": \"https://example.com/avatar.jpg\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/auth/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "2. Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "3. Get Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_JWT_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8081/auth/profile/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "profile", "1"]
+        }
+      }
+    },
+    {
+      "name": "4. Update Profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_JWT_TOKEN_HERE"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bio\": \"Updated bio via Postman!\",\n  \"mobile\": 1234567890\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/auth/profile/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "profile", "1"]
+        }
+      }
+    },
+    {
+      "name": "5. Change Password",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_JWT_TOKEN_HERE"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"1\",\n  \"newPassword\": \"newSecurePassword!\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/auth/password",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "password"]
+        }
+      }
+    },
+    {
+      "name": "6. Refresh Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_JWT_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8081/auth/refresh",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "refresh"]
+        }
+      }
+    },
+    {
+      "name": "7. Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_JWT_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8081/auth/logout",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "logout"]
+        }
+      }
+    },
+    {
+      "name": "8. Delete User (Admin Only)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer ADMIN_JWT_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8081/auth/delete/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["auth", "delete", "1"]
+        }
+      }
+    }
+  ]
+}
