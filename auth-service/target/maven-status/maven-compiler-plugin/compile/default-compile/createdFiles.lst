@@ -11,3 +11,4 @@ com\edulearn\auth\service\AuthService.class
 com\edulearn\auth\config\JwtAuthenticationFilter.class
 com\edulearn\auth\exception\GlobalExceptionHandler.class
 com\edulearn\auth\config\JwtUtil.class
+com\edulearn\auth\config\SwaggerConfig.class

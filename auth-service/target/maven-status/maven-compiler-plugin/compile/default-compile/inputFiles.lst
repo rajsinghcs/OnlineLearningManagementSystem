@@ -1,6 +1,7 @@
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\auth-service\src\main\java\com\edulearn\auth\exception\UserNotFoundException.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\auth-service\src\main\java\com\edulearn\auth\AuthServiceApplication.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\auth-service\src\main\java\com\edulearn\auth\config\JwtAuthenticationFilter.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\auth-service\src\main\java\com\edulearn\auth\config\SwaggerConfig.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\auth-service\src\main\java\com\edulearn\auth\exception\UserAlreadyExistsException.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\auth-service\src\main\java\com\edulearn\auth\repository\UserRepository.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\auth-service\src\main\java\com\edulearn\auth\service\AuthService.java
