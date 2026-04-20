@@ -12,6 +12,7 @@ com\edulearn\courselesson\serviceimpl\CourseServiceImpl.class
 com\edulearn\courselesson\entity\Lesson.class
 com\edulearn\courselesson\repository\LessonResourceRepository.class
 com\edulearn\courselesson\exception\CourseNotFoundException.class
+com\edulearn\courselesson\config\SwaggerConfig.class
 com\edulearn\courselesson\entity\LessonResource.class
 com\edulearn\courselesson\resource\LessonResourceController.class
 com\edulearn\courselesson\repository\LessonRepository.class
