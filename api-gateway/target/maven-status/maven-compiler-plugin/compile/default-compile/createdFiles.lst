@@ -1,0 +1,5 @@
+com\edulearn\gateway\config\CorsConfig.class
+com\edulearn\gateway\filter\JwtAuthFilter$Config.class
+com\edulearn\gateway\config\SecurityConfig.class
+com\edulearn\gateway\filter\JwtAuthFilter.class
+com\edulearn\gateway\ApiGatewayApplication.class
