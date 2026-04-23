@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Subscription Plans - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="text-center mb-5 pb-3">
+        <h2 class="fw-bold mb-2">Simple & Transparent Pricing</h2>
+        <p class="text-muted">Choose the plan that's right for your learning goals.</p>
+    </div>
+
+    <!-- Active Subscription Status -->
+    <div th:if="${subscription != null}" class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary-subtle text-primary border-start border-4 border-primary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-1">Active Plan: [[${subscription.plan}]]</h5>
+                        <p class="mb-0 small">Valid until: <span class="fw-bold">[[${#temporals.format(subscription.endDate, 'dd MMM yyyy')}]]</span></p>
+                    </div>
+                    <span class="badge bg-primary rounded-pill px-3 py-2">ACTIVE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Monthly Plan -->
+        <div class="col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-5 text-center plan-card">
+                <h5 class="fw-bold mb-4">Monthly</h5>
+                <h1 class="display-4 fw-bold mb-1">₹499</h1>
+                <p class="text-muted small mb-5">per month</p>
+                
+                <ul class="list-unstyled text-start mb-5 small text-muted">
+                    <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Access to 1000+ courses</li>
+                    <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Certificate of completion</li>
+                    <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Course resources & downloads</li>
+                    <li class="mb-3 text-decoration-line-through"><i class="fas fa-times text-muted me-2"></i>Offline viewing</li>
+                </ul>
+                
+                <form th:action="@{/student/subscription/subscribe}" method="post">
+                    <input type="hidden" name="plan" value="MONTHLY">
+                    <button type="submit" class="btn btn-outline-primary w-100 rounded-pill py-3 fw-bold" 
+                            th:classappend="${subscription != null && subscription.plan == 'MONTHLY'} ? 'disabled' : ''">
+                        [[${subscription != null && subscription.plan == 'MONTHLY' ? 'Current Plan' : 'Choose Plan'}]]
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Yearly Plan -->
+        <div class="col-lg-4">
+            <div class="card h-100 border-0 shadow-lg rounded-4 p-5 text-center plan-card border border-2 border-primary position-relative">
+                <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-primary px-3 py-2">BEST VALUE</span>
+                <h5 class="fw-bold mb-4">Yearly</h5>
+                <h1 class="display-4 fw-bold mb-1">₹3,999</h1>
+                <p class="text-muted small mb-5">per year (save 33%)</p>
+                
+                <ul class="list-unstyled text-start mb-5 small text-muted">
+                    <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Access to 5000+ courses</li>
+                    <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Priority instructor support</li>
+                    <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Expert-led workshops</li>
+                    <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Offline viewing & app access</li>
+                </ul>
+                
+                <form th:action="@{/student/subscription/subscribe}" method="post">
+                    <input type="hidden" name="plan" value="YEARLY">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow"
+                            th:classappend="${subscription != null && subscription.plan == 'YEARLY'} ? 'disabled' : ''">
+                        [[${subscription != null && subscription.plan == 'YEARLY' ? 'Current Plan' : 'Choose Plan'}]]
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

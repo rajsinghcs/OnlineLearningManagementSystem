@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Admin Dashboard - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary-subtle text-primary rounded-circle p-3 me-3">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                    <div class="text-muted small">Total Users</div>
+                </div>
+                <h3 class="fw-bold mb-0">0</h3>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-success-subtle text-success rounded-circle p-3 me-3">
+                        <i class="fas fa-rupee-sign fa-lg"></i>
+                    </div>
+                    <div class="text-muted small">Total Revenue</div>
+                </div>
+                <h3 class="fw-bold mb-0 text-success">₹[[${totalRevenue != null ? totalRevenue : '0.00'}]]</h3>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning-subtle text-warning rounded-circle p-3 me-3">
+                        <i class="fas fa-book fa-lg"></i>
+                    </div>
+                    <div class="text-muted small">Total Courses</div>
+                </div>
+                <h3 class="fw-bold mb-0">[[${totalCourses}]]</h3>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-info-subtle text-info rounded-circle p-3 me-3">
+                        <i class="fas fa-award fa-lg"></i>
+                    </div>
+                    <div class="text-muted small">Certificates</div>
+                </div>
+                <h3 class="fw-bold mb-0">[[${totalCerts}]]</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">Recent Activities</h6>
+                    <a th:href="@{/admin/courses}" class="small text-primary text-decoration-none">View All Courses</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="small">
+                                    <th class="ps-4">Course Title</th>
+                                    <th>Instructor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="small">
+                                    <td colspan="3" class="text-center py-4 text-muted italic">No recent activities to show.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h6 class="fw-bold mb-4">Quick Actions</h6>
+                <div class="d-grid gap-2">
+                    <a th:href="@{/admin/users}" class="btn btn-outline-primary rounded-pill text-start"><i class="fas fa-users-cog me-2"></i> Manage Users</a>
+                    <a th:href="@{/admin/notifications}" class="btn btn-outline-warning rounded-pill text-start"><i class="fas fa-paper-plane me-2"></i> Send Bulk Alert</a>
+                    <a th:href="@{/admin/courses}" class="btn btn-outline-success rounded-pill text-start"><i class="fas fa-check-double me-2"></i> Review Courses</a>
+                    <a th:href="@{/admin/payments}" class="btn btn-outline-info rounded-pill text-start"><i class="fas fa-receipt me-2"></i> View Payments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

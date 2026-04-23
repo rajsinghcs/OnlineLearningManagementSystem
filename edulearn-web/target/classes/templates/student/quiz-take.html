@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Take Quiz - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5">
+                <div class="card-header bg-primary text-white p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-0" th:text="${quiz.title}">Course Quiz</h4>
+                        <span class="x-small opacity-75">Passing Score: [[${quiz.passingScore}]]% | Time Limit: [[${quiz.timeLimitMinutes}]]m</span>
+                    </div>
+                    <div class="bg-white text-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+                        <i class="far fa-clock me-2"></i><span id="timer">00:00</span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-5">
+                    <form th:action="@{/student/quiz/{id}/submit(id=${attempt.attemptId})}" method="post" id="quizForm">
+                        <div th:each="q, stat : ${questions}" class="mb-5 pb-5 border-bottom last-child-no-border">
+                            <h5 class="fw-bold mb-4">
+                                <span class="badge bg-light text-primary rounded-circle me-2">[[${stat.count}]]</span>
+                                [[${q.questionText}]]
+                            </h5>
+                            
+                            <div class="options-group">
+                                <!-- MCQ Options -->
+                                <div th:if="${q.type == 'MCQ'}" class="row g-3">
+                                    <div class="col-md-6" th:each="opt : ${#list.of('A','B','C','D')}">
+                                        <input type="radio" class="btn-check" th:name="'q' + ${q.id}" th:id="'q' + ${q.id} + ${opt}" th:value="${opt}" required>
+                                        <label class="btn btn-outline-secondary w-100 text-start p-3 rounded-3" th:for="'q' + ${q.id} + ${opt}">
+                                            <span class="fw-bold me-2">[[${opt}]].</span> [[${q['option' + opt]}]]
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- True/False -->
+                                <div th:if="${q.type == 'TRUE_FALSE'}" class="d-flex gap-3">
+                                    <input type="radio" class="btn-check" th:name="'q' + ${q.id}" th:id="'q' + ${q.id} + 'T'" value="TRUE" required>
+                                    <label class="btn btn-outline-success flex-fill p-3 rounded-3" th:for="'q' + ${q.id} + 'T'">TRUE</label>
+                                    
+                                    <input type="radio" class="btn-check" th:name="'q' + ${q.id}" th:id="'q' + ${q.id} + 'F'" value="FALSE" required>
+                                    <label class="btn btn-outline-danger flex-fill p-3 rounded-3" th:for="'q' + ${q.id} + 'F'">FALSE</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow">Submit Quiz</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Script -->
+    <script th:inline="javascript">
+        let timeLeft = [[${quiz.timeLimitMinutes}]] * 60;
+        const timerDisplay = document.getElementById('timer');
+        const form = document.getElementById('quizForm');
+
+        const countdown = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (timeLeft <= 30) {
+                timerDisplay.parentElement.classList.remove('text-primary');
+                timerDisplay.parentElement.classList.add('text-danger');
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                form.submit();
+            }
+            timeLeft--;
+        }, 1000);
+    </script>
+</section>
+</body>
+</html>

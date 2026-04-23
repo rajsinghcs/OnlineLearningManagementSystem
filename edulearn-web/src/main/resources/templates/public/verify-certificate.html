@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Verify Certificate - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="row justify-content-center pt-5">
+        <div class="col-lg-6 text-center">
+            <div class="card border-0 shadow-lg rounded-4 p-5">
+                <div th:if="${valid}">
+                    <div class="bg-success-subtle text-success rounded-circle d-inline-block p-4 mb-4">
+                        <i class="fas fa-check-shield fa-4x"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark">Certificate Verified</h2>
+                    <div class="badge bg-success rounded-pill px-4 py-2 mb-4">VALID & AUTHENTIC</div>
+                    
+                    <div class="text-start p-4 bg-light rounded-4 mb-4">
+                        <div class="mb-3">
+                            <div class="x-small text-muted">Issued To</div>
+                            <div class="fw-bold" th:text="${certificate.studentName != null ? certificate.studentName : 'Student'}">John Doe</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="x-small text-muted">Course Name</div>
+                            <div class="fw-bold" th:text="${certificate.courseName}">Advanced Web Development</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="x-small text-muted">Issued Date</div>
+                                <div class="fw-bold" th:text="${#temporals.format(certificate.issuedAt, 'dd MMM yyyy')}">12 Oct 2025</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="x-small text-muted">Verification Code</div>
+                                <div class="fw-bold text-primary font-monospace" th:text="${certificate.verificationCode}">EDL-774-X92</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${valid}">
+                    <div class="bg-danger-subtle text-danger rounded-circle d-inline-block p-4 mb-4">
+                        <i class="fas fa-times-circle fa-4x"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark">Invalid Certificate</h2>
+                    <div class="badge bg-danger rounded-pill px-4 py-2 mb-4">NOT VERIFIED</div>
+                    <p class="text-muted" th:text="${message}">The verification code provided is invalid or has expired.</p>
+                </div>
+
+                <hr class="my-4">
+                <a th:href="@{/}" class="btn btn-outline-primary rounded-pill px-4">Visit EduLearn Homepage</a>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

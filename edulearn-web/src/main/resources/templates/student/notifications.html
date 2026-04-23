@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Notifications - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h2 class="fw-bold mb-0">Notifications</h2>
+                <button class="btn btn-light rounded-pill btn-sm">Settings</button>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="list-group list-group-flush">
+                    <div th:each="n : ${notifications}" class="list-group-item p-4 border-0 border-bottom d-flex gap-3 notification-item" th:classappend="${!n.isRead ? 'bg-light-primary' : ''}">
+                        <div class="rounded-circle p-3 d-flex align-items-center justify-content-center flex-shrink-0" 
+                             th:classappend="${n.type == 'COURSE' ? 'bg-primary-subtle text-primary' : (n.type == 'PAYMENT' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning')}"
+                             style="width: 50px; height: 50px;">
+                            <i th:class="${n.type == 'COURSE' ? 'fas fa-book' : (n.type == 'PAYMENT' ? 'fas fa-receipt' : 'fas fa-bullhorn')}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="fw-bold mb-0" th:text="${n.title}">Notification Title</h6>
+                                <span class="x-small text-muted" th:text="${#temporals.format(n.createdAt, 'MMM dd, HH:mm')}">12 Oct, 10:30</span>
+                            </div>
+                            <p class="text-muted small mb-0" th:text="${n.message}">Your enrollment has been confirmed.</p>
+                        </div>
+                        <div th:if="${!n.isRead}" class="d-flex align-items-center">
+                            <span class="p-1 bg-primary rounded-circle"></span>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${notifications == null || notifications.length == 0}" class="text-center py-5">
+                        <i class="fas fa-bell-slash fa-4x text-light mb-3"></i>
+                        <p class="text-muted">You're all caught up!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

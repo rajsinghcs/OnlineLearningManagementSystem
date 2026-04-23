@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Course Forum - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">Course Forum</h2>
+            <p class="text-muted small mb-0">Ask questions and discuss topics with fellow students.</p>
+        </div>
+        <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#newThreadModal">
+            <i class="fas fa-plus me-2"></i>Start New Discussion
+        </button>
+    </div>
+
+    <div class="row g-4">
+        <!-- Forum Sidebar / Filters -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h6 class="fw-bold mb-3 small">Categories</h6>
+                <div class="list-group list-group-flush small">
+                    <a href="#" class="list-group-item list-group-item-action border-0 px-0 py-2 text-primary fw-bold">All Discussions</a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 px-0 py-2 text-muted">Technical Questions</a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 px-0 py-2 text-muted">General Discussion</a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 px-0 py-2 text-muted">Announcements</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thread List -->
+        <div class="col-lg-9">
+            <div th:each="thread : ${threads}" class="card border-0 shadow-sm rounded-4 p-4 mb-3 thread-card position-relative overflow-hidden">
+                <div th:if="${thread.isPinned}" class="position-absolute top-0 end-0 p-3">
+                    <i class="fas fa-thumbtack text-primary"></i>
+                </div>
+                
+                <div class="d-flex gap-3">
+                    <img src="/images/default-avatar.png" class="rounded-circle" width="45" height="45" alt="Author">
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6 class="fw-bold mb-1"><a th:href="@{/student/forum/thread/{id}(id=${thread.threadId})}" class="text-dark text-decoration-none">[[${thread.title}]]</a></h6>
+                        </div>
+                        <p class="text-muted small mb-3 text-truncate-2">[[${thread.body}]]</p>
+                        
+                        <div class="d-flex align-items-center gap-3 x-small text-muted">
+                            <span><i class="fas fa-user me-1"></i>[[${thread.authorName}]]</span>
+                            <span><i class="far fa-clock me-1"></i>[[${#temporals.format(thread.createdAt, 'MMM dd, HH:mm')}]]</span>
+                            <span th:if="${thread.isClosed}" class="badge bg-light text-secondary rounded-pill px-2">Closed</span>
+                        </div>
+                    </div>
+                    <div class="text-center bg-light rounded-3 p-2 min-width-60">
+                        <div class="fw-bold text-primary">0</div>
+                        <div class="x-small text-muted">Replies</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${threads == null || threads.length == 0}" class="text-center py-5 bg-white rounded-4 shadow-sm">
+                <i class="far fa-comments fa-4x text-light mb-3"></i>
+                <p class="text-muted">No discussions yet. Be the first to start one!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Thread Modal -->
+    <div class="modal fade" id="newThreadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header border-0 p-4">
+                    <h5 class="modal-title fw-bold">Start New Discussion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <form th:action="@{/student/forum/{cid}/thread(cid=${courseId})}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Topic Title</label>
+                            <input type="text" name="title" class="form-control rounded-3" placeholder="What is your question?" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold">Details</label>
+                            <textarea name="body" class="form-control rounded-3" rows="5" placeholder="Provide more context..." required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-light rounded-pill px-4 me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">Post Discussion</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

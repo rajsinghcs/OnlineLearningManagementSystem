@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Course Details - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <!-- Course Header -->
+    <div class="row mb-5 g-5">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item"><a th:href="@{/student/courses}">Courses</a></li>
+                    <li class="breadcrumb-item active" th:text="${course.category}">Programming</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold mb-3" th:text="${course.title}">Advanced Full-Stack Development</h1>
+            <p class="lead text-muted mb-4" th:text="${course.description}">Master modern web technologies from database to UI with this comprehensive guide.</p>
+            
+            <div class="d-flex flex-wrap gap-4 align-items-center mb-5">
+                <div class="d-flex align-items-center">
+                    <img src="/images/default-avatar.png" class="rounded-circle me-2" width="40" height="40" alt="Instructor">
+                    <div>
+                        <div class="x-small text-muted">Created by</div>
+                        <div class="small fw-bold" th:text="${course.instructorName}">Dr. Emily Smith</div>
+                    </div>
+                </div>
+                <div class="vr d-none d-md-block"></div>
+                <div>
+                    <div class="x-small text-muted">Last Updated</div>
+                    <div class="small fw-bold" th:text="${#temporals.format(course.createdAt, 'MMM yyyy')}">Oct 2025</div>
+                </div>
+                <div class="vr d-none d-md-block"></div>
+                <div>
+                    <div class="x-small text-muted">Language</div>
+                    <div class="small fw-bold" th:text="${course.language}">English</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav nav-pills mb-4 gap-2" id="courseTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill px-4" id="curriculum-tab" data-bs-toggle="pill" data-bs-target="#curriculum" type="button">Curriculum</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4" id="instructor-tab" data-bs-toggle="pill" data-bs-target="#instructor" type="button">Instructor</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="courseTabContent">
+                <div class="tab-pane fade show active" id="curriculum" role="tabpanel">
+                    <div class="accordion border-0 shadow-sm rounded-4 overflow-hidden" id="accordionCurriculum">
+                        <div class="accordion-item border-0">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-white fw-bold py-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                    Course Modules
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show">
+                                <div class="accordion-body p-0">
+                                    <div class="list-group list-group-flush">
+                                        <div th:each="lesson : ${lessons}" class="list-group-item py-3 px-4 d-flex justify-content-between align-items-center border-0 border-bottom">
+                                            <div class="d-flex align-items-center">
+                                                <i class="far fa-play-circle text-primary me-3"></i>
+                                                <div>
+                                                    <div class="small fw-medium" th:text="${lesson.title}">Introduction to the Course</div>
+                                                    <span class="x-small text-muted" th:text="${lesson.durationMinutes + ' mins'}">5 mins</span>
+                                                </div>
+                                            </div>
+                                            <span th:if="${lesson.isPreview}" class="badge bg-success-subtle text-success rounded-pill x-small px-3">Preview</span>
+                                            <i th:unless="${lesson.isPreview || isEnrolled}" class="fas fa-lock text-muted small"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="instructor" role="tabpanel">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="/images/default-avatar.png" class="rounded-circle me-3" width="80" height="80" alt="Instructor">
+                            <div>
+                                <h5 class="fw-bold mb-1" th:text="${course.instructorName}">Dr. Emily Smith</h5>
+                                <p class="text-muted small mb-0">Senior Software Architect & Educator</p>
+                            </div>
+                        </div>
+                        <p class="text-muted small">Emily has over 15 years of experience in building scalable systems. She has taught over 100k students worldwide.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Purchase Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden sticky-top" style="top: 100px;">
+                <div class="position-relative">
+                    <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : '/images/default-course-thumbnail.jpg'}" class="card-img-top" alt="Course">
+                    <a th:if="${previews != null && previews.length > 0}" th:href="@{/student/learn/{cid}/{lid}(cid=${course.courseId}, lid=${previews[0].lessonId})}" class="position-absolute top-50 start-50 translate-middle btn btn-light rounded-circle p-3 shadow">
+                        <i class="fas fa-play text-primary"></i>
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h2 class="fw-bold mb-0" th:text="${course.price > 0 ? '₹' + course.price : 'FREE'}">₹1,299</h2>
+                        <span th:if="${course.price > 0}" class="text-muted text-decoration-line-through small">₹4,999</span>
+                        <span th:if="${course.price > 0}" class="text-success small fw-bold ms-2">74% OFF</span>
+                    </div>
+
+                    <div th:if="${isEnrolled}">
+                        <div class="alert alert-success border-0 rounded-3 small mb-4">
+                            <i class="fas fa-check-circle me-2"></i>You are enrolled in this course!
+                        </div>
+                        <a th:href="@{/student/learn/{cid}/0(cid=${course.courseId})}" class="btn btn-primary btn-lg w-100 rounded-pill py-3 shadow-sm mb-3">Go to Course</a>
+                    </div>
+                    
+                    <div th:unless="${isEnrolled}">
+                        <a th:href="@{/student/checkout/{id}(id=${course.courseId})}" class="btn btn-primary btn-lg w-100 rounded-pill py-3 shadow-sm mb-3">
+                            <i class="fas fa-shopping-cart me-2"></i>Enroll Now
+                        </a>
+                        <button class="btn btn-outline-secondary btn-lg w-100 rounded-pill py-3 mb-4">Add to Wishlist</button>
+                    </div>
+
+                    <div class="small fw-bold mb-3">This course includes:</div>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li class="mb-2"><i class="fas fa-tv me-3 text-primary"></i>[[${course.totalDuration}]] hours of on-demand video</li>
+                        <li class="mb-2"><i class="fas fa-file-download me-3 text-primary"></i>12 Downloadable resources</li>
+                        <li class="mb-2"><i class="fas fa-infinity me-3 text-primary"></i>Full lifetime access</li>
+                        <li class="mb-2"><i class="fas fa-mobile-alt me-3 text-primary"></i>Access on mobile and TV</li>
+                        <li><i class="fas fa-certificate me-3 text-primary"></i>Certificate of completion</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

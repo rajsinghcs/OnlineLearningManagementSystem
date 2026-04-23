@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Dashboard - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="row g-4">
+        <!-- Sidebar/Profile Summary -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-4 mb-4">
+                <div class="position-relative d-inline-block mx-auto mb-3">
+                    <img th:src="${user.profilePicUrl != null ? user.profilePicUrl : '/images/default-avatar.png'}" 
+                         class="rounded-circle border border-4 border-white shadow-sm" width="100" height="100" alt="Profile">
+                    <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-2" title="Active"></span>
+                </div>
+                <h5 class="fw-bold mb-1" th:text="${user.fullName}">John Doe</h5>
+                <p class="text-muted small mb-3" th:text="${user.email}">john@example.com</p>
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3">Student</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-3">Active</span>
+                </div>
+                <a th:href="@{/student/subscription}" class="btn btn-outline-primary btn-sm rounded-pill w-100 mb-2">View Subscription</a>
+                <a href="#" class="btn btn-light btn-sm rounded-pill w-100">Edit Profile</a>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-3">
+                <h6 class="fw-bold mb-3 ms-2">Quick Links</h6>
+                <div class="list-group list-group-flush small">
+                    <a th:href="@{/student/my-courses}" class="list-group-item list-group-item-action border-0 rounded-3 mb-1">
+                        <i class="fas fa-book-reader me-2 text-primary"></i>My Courses
+                    </a>
+                    <a th:href="@{/student/notifications}" class="list-group-item list-group-item-action border-0 rounded-3 mb-1">
+                        <i class="fas fa-bell me-2 text-warning"></i>Notifications
+                        <span th:if="${unreadCount > 0}" class="badge bg-danger rounded-pill float-end" th:text="${unreadCount}">2</span>
+                    </a>
+                    <a th:href="@{/student/courses}" class="list-group-item list-group-item-action border-0 rounded-3 mb-1">
+                        <i class="fas fa-search me-2 text-success"></i>Explore Catalog
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Welcome Back, <span class="text-primary" th:text="${#strings.arraySplit(user.fullName, ' ')[0]}">Learner</span>! 👋</h3>
+                <span class="text-muted small"><i class="far fa-calendar-alt me-2"></i>[[${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}]]</span>
+            </div>
+
+            <!-- In-Progress Section -->
+            <div class="mb-5">
+                <h5 class="fw-bold mb-4">Continue Learning</h5>
+                <div class="row g-4" th:if="${enrollments != null && enrollments.length > 0}">
+                    <div class="col-md-6" th:each="enroll : ${enrollments}" th:if="${enroll.status == 'ACTIVE' && enroll.progressPercent < 100}">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="row g-0 h-100">
+                                <div class="col-4">
+                                    <img th:src="${enroll.courseThumbnail != null ? enroll.courseThumbnail : '/images/default-course-thumbnail.jpg'}" 
+                                         class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Course">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body p-3 d-flex flex-column h-100">
+                                        <h6 class="fw-bold mb-2 text-truncate" th:text="${enroll.courseTitle}">Course Title</h6>
+                                        <div class="mt-auto">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="text-muted x-small">Progress</span>
+                                                <span class="fw-bold text-primary small" th:text="${enroll.progressPercent + '%'}">45%</span>
+                                            </div>
+                                            <div class="progress mb-3" style="height: 6px;">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" th:style="'width: ' + ${enroll.progressPercent} + '%'"></div>
+                                            </div>
+                                            <a th:href="@{/student/learn/{cid}/0(cid=${enroll.courseId})}" class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm">Continue</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm" th:unless="${enrollments != null && enrollments.length > 0}">
+                    <img src="https://illustrations.popsy.co/blue/online-learning.svg" width="150" alt="Empty" class="mb-3">
+                    <p class="text-muted">You are not enrolled in any courses yet.</p>
+                    <a th:href="@{/student/courses}" class="btn btn-primary rounded-pill px-4">Browse Catalog</a>
+                </div>
+            </div>
+
+            <!-- Stats & Achievements -->
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary-subtle text-primary rounded-circle p-3 me-3">
+                                <i class="fas fa-book fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-0" th:text="${enrollments != null ? enrollments.length : 0}">0</h4>
+                                <span class="text-muted small">Enrolled Courses</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success-subtle text-success rounded-circle p-3 me-3">
+                                <i class="fas fa-check-circle fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-0">0</h4>
+                                <span class="text-muted small">Completed Courses</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning-subtle text-warning rounded-circle p-3 me-3">
+                                <i class="fas fa-certificate fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-0">0</h4>
+                                <span class="text-muted small">Certificates Earned</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>My Courses - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h2 class="fw-bold mb-2">My Learning</h2>
+            <p class="text-muted mb-0">Continue your journey where you left off.</p>
+        </div>
+        <div class="btn-group rounded-pill overflow-hidden shadow-sm">
+            <button class="btn btn-primary px-4">All</button>
+            <button class="btn btn-white px-4 border">In Progress</button>
+            <button class="btn btn-white px-4 border">Completed</button>
+        </div>
+    </div>
+
+    <div class="row g-4" th:if="${enrollments != null && enrollments.length > 0}">
+        <div class="col-lg-4 col-md-6" th:each="enroll : ${enrollments}">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden course-card-progress">
+                <div class="position-relative">
+                    <img th:src="${enroll.courseThumbnail != null ? enroll.courseThumbnail : '/images/default-course-thumbnail.jpg'}" 
+                         class="card-img-top" alt="Course" style="height: 180px; object-fit: cover;">
+                    <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-gradient-dark">
+                        <div class="progress" style="height: 5px;">
+                            <div class="progress-bar" role="progressbar" th:style="'width: ' + ${enroll.progressPercent} + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3 text-truncate-2" th:text="${enroll.courseTitle}">Machine Learning with Python</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="text-muted x-small">Progress</span>
+                        <span class="fw-bold text-primary small" th:text="${enroll.progressPercent + '%'}">60%</span>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/student/learn/{cid}/0(cid=${enroll.courseId})}" class="btn btn-primary rounded-pill py-2 shadow-sm">
+                            <i class="fas fa-play me-2 small"></i>Continue Learning
+                        </a>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/student/forum/{cid}(cid=${enroll.courseId})}" class="btn btn-light flex-fill rounded-pill py-2 small">
+                                <i class="far fa-comments me-2 text-muted"></i>Forum
+                            </a>
+                            <a th:if="${enroll.progressPercent == 100}" th:href="@{/student/certificate/{cid}(cid=${enroll.courseId})}" class="btn btn-success-subtle text-success flex-fill rounded-pill py-2 small">
+                                <i class="fas fa-award me-2"></i>Cert
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-5" th:if="${enrollments == null || enrollments.length == 0}">
+        <div class="mb-4">
+            <i class="fas fa-book-open fa-5x text-light"></i>
+        </div>
+        <h4 class="fw-bold">No courses yet</h4>
+        <p class="text-muted mb-4">You haven't enrolled in any courses. Explore our catalog to find something interesting.</p>
+        <a th:href="@{/student/courses}" class="btn btn-primary btn-lg rounded-pill px-5 shadow">Explore Courses</a>
+    </div>
+</section>
+</body>
+</html>

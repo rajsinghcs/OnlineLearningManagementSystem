@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>EduLearn - Welcome to Your Future</title>
+</head>
+<body>
+<section>
+    <!-- Hero Section -->
+    <div class="row align-items-center py-5 mb-5 bg-gradient-light rounded-4 px-4 overflow-hidden position-relative">
+        <div class="col-lg-6 position-relative z-1">
+            <h1 class="display-4 fw-bold text-dark mb-4">Learn From Anywhere, <br><span class="text-primary">Master Anything</span></h1>
+            <p class="lead text-muted mb-5">Access 5000+ premium courses taught by world-class industry experts. Start your journey today.</p>
+            
+            <form th:action="@{/student/courses}" method="get" class="mb-4">
+                <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden bg-white">
+                    <span class="input-group-text bg-white border-0 ps-4"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" name="keyword" class="form-control border-0 py-3" placeholder="What do you want to learn?">
+                    <button class="btn btn-primary px-5 py-3 rounded-pill me-1 my-1" type="submit">Search</button>
+                </div>
+            </form>
+            
+            <div class="d-flex align-items-center gap-4 text-muted small">
+                <span><i class="fas fa-check-circle text-success me-2"></i>Unlimited Access</span>
+                <span><i class="fas fa-check-circle text-success me-2"></i>Expert Instructors</span>
+                <span><i class="fas fa-check-circle text-success me-2"></i>Certificates</span>
+            </div>
+        </div>
+        <div class="col-lg-6 d-none d-lg-block">
+            <img th:src="@{/images/hero-image.png}" class="img-fluid rounded-4 shadow-lg hero-img-floating" alt="Learning">
+        </div>
+        
+        <!-- Background Decorations -->
+        <div class="position-absolute top-0 end-0 p-5 opacity-10">
+            <i class="fas fa-code fa-9x rotate-12"></i>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="row g-4 mb-5 text-center">
+        <div class="col-md-3">
+            <div class="p-4 rounded-4 bg-white shadow-sm">
+                <h2 class="fw-bold text-primary mb-1">50K+</h2>
+                <span class="text-muted">Students</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-4 rounded-4 bg-white shadow-sm">
+                <h2 class="fw-bold text-primary mb-1">1.2K+</h2>
+                <span class="text-muted">Courses</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-4 rounded-4 bg-white shadow-sm">
+                <h2 class="fw-bold text-primary mb-1">200+</h2>
+                <span class="text-muted">Instructors</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-4 rounded-4 bg-white shadow-sm">
+                <h2 class="fw-bold text-primary mb-1">4.8/5</h2>
+                <span class="text-muted">User Rating</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Courses -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Featured Courses</h2>
+                <p class="text-muted mb-0">Pick a course and start learning something new</p>
+            </div>
+            <a th:href="@{/student/courses}" class="btn btn-outline-primary rounded-pill px-4">View All Courses</a>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6" th:each="course : ${featuredCourses}">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden course-card">
+                    <div class="position-relative">
+                        <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : '/images/default-course-thumbnail.jpg'}" 
+                             class="card-img-top" alt="Course" style="height: 200px; object-fit: cover;">
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-primary" th:text="${course.level}">Beginner</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-light text-primary border border-primary-subtle rounded-pill x-small px-3 py-1 me-2" th:text="${course.category}">Programming</span>
+                            <span class="text-muted x-small"><i class="far fa-clock me-1"></i>[[${course.totalDuration}]]h</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3" th:text="${course.title}">Web Development Bootcamp 2026</h5>
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="/images/default-avatar.png" class="rounded-circle me-2" width="24" height="24" alt="Instructor">
+                            <span class="text-muted small">[[${course.instructorName}]]</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <h4 class="fw-bold text-primary mb-0" th:text="${course.price > 0 ? '₹' + course.price : 'FREE'}">₹499</h4>
+                            <a th:href="@{/student/courses/{id}(id=${course.courseId})}" class="btn btn-primary rounded-pill px-4 shadow-sm">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

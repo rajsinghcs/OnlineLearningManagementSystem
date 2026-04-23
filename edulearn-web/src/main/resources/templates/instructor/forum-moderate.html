@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Moderate Forum - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">Moderate Forum</h2>
+            <p class="text-muted small mb-0">Course ID: <span class="text-primary fw-bold">#[[${courseId}]]</span></p>
+        </div>
+        <a th:href="@{/instructor/dashboard}" class="btn btn-light rounded-pill px-4">Back</a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">Topic</th>
+                        <th class="py-3">Author</th>
+                        <th class="py-3">Status</th>
+                        <th class="py-3 pe-4 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${threads}">
+                        <td class="ps-4">
+                            <div class="fw-bold">[[${t.title}]]</div>
+                            <span class="x-small text-muted">Created: [[${#temporals.format(t.createdAt, 'dd MMM yyyy')}]]</span>
+                        </td>
+                        <td th:text="${t.authorName}">Student Name</td>
+                        <td>
+                            <span th:if="${t.isPinned}" class="badge bg-primary rounded-pill px-2 me-1"><i class="fas fa-thumbtack me-1"></i>Pinned</span>
+                            <span th:if="${t.isClosed}" class="badge bg-secondary rounded-pill px-2">Closed</span>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <form th:action="@{/instructor/forum/{tid}/pin(tid=${t.threadId})}" method="post">
+                                    <input type="hidden" name="courseId" th:value="${courseId}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3" th:text="${t.isPinned ? 'Unpin' : 'Pin'}">Pin</button>
+                                </form>
+                                <form th:action="@{/instructor/forum/{tid}/close(tid=${t.threadId})}" method="post">
+                                    <input type="hidden" name="courseId" th:value="${courseId}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3" th:text="${t.isClosed ? 'Open' : 'Close'}">Close</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${threads == null || threads.length == 0}">
+                        <td colspan="4" class="text-center py-5 text-muted small italic">No forum threads in this course.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

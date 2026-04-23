@@ -1,0 +1,23 @@
+<div class="card border-0 shadow-sm rounded-3 h-100" th:fragment="sidebar">
+    <div class="card-header bg-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="fas fa-list-ul me-2 text-primary"></i>Course Content</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            <a th:each="l : ${allLessons}" 
+               th:href="@{/student/learn/{cid}/{lid}(cid=${courseId}, lid=${l.lessonId})}"
+               class="list-group-item list-group-item-action py-3 px-4 border-0 border-bottom d-flex align-items-center justify-content-between"
+               th:classappend="${l.lessonId == lesson.lessonId} ? 'bg-light fw-bold text-primary active-lesson-item' : ''">
+                <div class="d-flex align-items-center">
+                    <span class="me-3 text-muted small" th:text="${l.orderIndex + '.'}">1.</span>
+                    <div>
+                        <div class="small" th:text="${l.title}">Lesson Title</div>
+                        <span class="badge bg-secondary-subtle text-secondary x-small mt-1" th:text="${l.durationMinutes + ' min'}">10 min</span>
+                    </div>
+                </div>
+                <i th:if="${l.lessonId == lesson.lessonId}" class="fas fa-play-circle text-primary"></i>
+                <i th:unless="${l.lessonId == lesson.lessonId}" class="far fa-circle text-muted"></i>
+            </a>
+        </div>
+    </div>
+</div>

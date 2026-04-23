@@ -1,0 +1,43 @@
+<footer class="bg-dark text-light py-5 mt-auto" th:fragment="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h5 class="fw-bold mb-3">EduLearn LMS</h5>
+                <p class="text-muted small">The ultimate platform for online learning and skill development. Empowering millions around the world through quality education.</p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-light"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h6 class="fw-bold mb-3">Platform</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a th:href="@{/student/courses}" class="text-muted text-decoration-none">Browse Courses</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Categories</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Instructors</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h6 class="fw-bold mb-3">Support</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Help Center</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Terms of Service</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <h6 class="fw-bold mb-3">Subscribe to Newsletter</h6>
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="Email address">
+                    <button class="btn btn-primary" type="button">Subscribe</button>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 border-secondary">
+        <div class="text-center text-muted small">
+            &copy; 2026 EduLearn LMS. All rights reserved. Built with ❤️ for learners.
+        </div>
+    </div>
+</footer>

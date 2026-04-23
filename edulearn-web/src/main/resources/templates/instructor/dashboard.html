@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Instructor Dashboard - EduLearn LMS</title>
+</head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">Instructor Dashboard</h2>
+            <p class="text-muted small mb-0">Manage your courses and track student performance.</p>
+        </div>
+        <a th:href="@{/instructor/courses/new}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="fas fa-plus me-2"></i>Create New Course
+        </a>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="text-muted small mb-1">Total Courses</div>
+                <h3 class="fw-bold mb-0" th:text="${courses != null ? courses.length : 0}">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="text-muted small mb-1">Total Students</div>
+                <h3 class="fw-bold mb-0">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="text-muted small mb-1">Course Ratings</div>
+                <h3 class="fw-bold mb-0">4.9</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="text-muted small mb-1">Total Earnings</div>
+                <h3 class="fw-bold mb-0 text-success">₹0.00</h3>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="fw-bold mb-4">My Courses</h5>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">Course</th>
+                        <th class="py-3">Category</th>
+                        <th class="py-3">Price</th>
+                        <th class="py-3 text-center">Status</th>
+                        <th class="py-3 pe-4 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${courses}">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <img th:src="${c.thumbnailUrl != null ? c.thumbnailUrl : '/images/default-course-thumbnail.jpg'}" 
+                                     class="rounded-3 me-3" width="60" height="40" style="object-fit: cover;" alt="Course">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">[[${c.title}]]</h6>
+                                    <span class="x-small text-muted">Created: [[${#temporals.format(c.createdAt, 'dd MMM yyyy')}]]</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${c.category}">Programming</td>
+                        <td th:text="${c.price > 0 ? '₹' + c.price : 'Free'}">₹499</td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill px-3" 
+                                  th:classappend="${c.isApproved ? 'bg-success' : 'bg-warning'}"
+                                  th:text="${c.isApproved ? 'Approved' : 'Pending Approval'}">Approved</span>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <a th:href="@{/instructor/courses/{id}/edit(id=${c.courseId})}" class="btn btn-sm btn-outline-secondary rounded-start-pill px-3">Edit</a>
+                                <a th:href="@{/instructor/courses/{id}/lessons(id=${c.courseId})}" class="btn btn-sm btn-outline-primary px-3">Lessons</a>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split rounded-end-pill px-2" data-bs-toggle="dropdown"></button>
+                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                                        <li><a class="dropdown-item small" th:href="@{/instructor/courses/{id}/students(id=${c.courseId})}"><i class="fas fa-users me-2"></i>Students</a></li>
+                                        <li><a class="dropdown-item small" th:href="@{/instructor/courses/{id}/quiz/new(id=${c.courseId})}"><i class="fas fa-question-circle me-2"></i>Add Quiz</a></li>
+                                        <li><a class="dropdown-item small" th:href="@{/instructor/courses/{id}/analytics(id=${c.courseId})}"><i class="fas fa-chart-line me-2"></i>Analytics</a></li>
+                                        <li><a class="dropdown-item small" th:href="@{/instructor/courses/{id}/forum(id=${c.courseId})}"><i class="far fa-comments me-2"></i>Forum</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li th:if="${!c.isPublished}"><form th:action="@{/instructor/courses/{id}/publish(id=${c.courseId})}" method="post"><button type="submit" class="dropdown-item small text-success"><i class="fas fa-upload me-2"></i>Publish Course</button></form></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${courses == null || courses.length == 0}">
+                        <td colspan="5" class="text-center py-5 text-muted small italic">No courses created yet. Start by creating your first course!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

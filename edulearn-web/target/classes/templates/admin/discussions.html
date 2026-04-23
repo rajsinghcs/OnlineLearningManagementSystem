@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Moderate Discussions - EduLearn Admin</title>
+</head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="fw-bold mb-0">Platform Discussions</h2>
+        <a th:href="@{/admin/dashboard}" class="btn btn-light rounded-pill px-4">Back</a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-5">
+        <form th:action="@{/admin/discussions}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-9">
+                <label class="form-label small fw-bold">Filter by Course ID</label>
+                <input type="number" name="courseId" th:value="${courseId}" class="form-control rounded-pill" placeholder="Enter Course ID">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100 rounded-pill">Filter Threads</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Topic</th>
+                        <th>Course</th>
+                        <th>Author</th>
+                        <th class="pe-4 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${threads}">
+                        <td class="ps-4">
+                            <div class="fw-bold small">[[${t.title}]]</div>
+                            <span class="x-small text-muted">Created: [[${#temporals.format(t.createdAt, 'dd MMM yyyy')}]]</span>
+                        </td>
+                        <td class="small">#[[${t.courseId}]]</td>
+                        <td class="small">[[${t.authorName}]]</td>
+                        <td class="pe-4 text-end">
+                            <form th:action="@{/admin/discussions/{tid}/delete(tid=${t.threadId})}" method="post">
+                                <input type="hidden" name="courseId" th:value="${courseId}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Delete this thread and all its replies?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${threads == null || threads.length == 0}">
+                        <td colspan="4" class="text-center py-5 text-muted small italic">Enter a Course ID to view and moderate discussions.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

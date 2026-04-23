@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Transaction History - EduLearn Admin</title>
+</head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">Transaction History</h2>
+            <p class="text-muted small mb-0">Total Platform Revenue: <span class="text-success fw-bold">₹[[${totalRevenue}]]</span></p>
+        </div>
+        <a th:href="@{/admin/dashboard}" class="btn btn-light rounded-pill px-4">Back</a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">TXN ID</th>
+                        <th>Student</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Status</th>
+                        <th class="pe-4 text-end">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${payments}">
+                        <td class="ps-4 font-monospace small">[[${p.transactionId}]]</td>
+                        <td class="small">Student #[[${p.studentId}]]</td>
+                        <td class="fw-bold text-dark">₹[[${p.amount}]]</td>
+                        <td class="small">[[${p.mode}]]</td>
+                        <td>
+                            <span class="badge rounded-pill px-3" th:classappend="${p.status == 'SUCCESS' ? 'bg-success' : 'bg-danger'}" th:text="${p.status}">SUCCESS</span>
+                        </td>
+                        <td class="pe-4 text-end small text-muted" th:text="${#temporals.format(p.paidAt, 'dd MMM yyyy, HH:mm')}">12 Oct 2025</td>
+                    </tr>
+                    <tr th:if="${payments == null || payments.length == 0}">
+                        <td colspan="6" class="text-center py-5 text-muted small italic">No transactions found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

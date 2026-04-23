@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="${lesson.title} + ' - EduLearn LMS'">Watching Lesson</title>
+</head>
+<body>
+<section class="p-0">
+    <div class="row g-0 rounded-4 overflow-hidden shadow-lg bg-white" style="min-height: 80vh;">
+        <!-- Left Sidebar (Lesson Navigation) -->
+        <div class="col-lg-3 border-end bg-light">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        </div>
+
+        <!-- Main Video Area -->
+        <div class="col-lg-9 d-flex flex-column">
+            <!-- Video Player -->
+            <div class="bg-black ratio ratio-16x9">
+                <!-- If content is video URL -->
+                <video id="eduVideo" controls controlsList="nodownload" class="w-100 h-100" th:if="${lesson.contentType == 'VIDEO'}">
+                    <source th:src="${lesson.contentUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <!-- If content is YouTube/Embed -->
+                <iframe th:if="${lesson.contentType == 'EMBED'}" th:src="${lesson.contentUrl}" allowfullscreen></iframe>
+                
+                <!-- Placeholder if no video -->
+                <div th:if="${lesson.contentType == 'TEXT'}" class="bg-white p-5 h-100 overflow-auto">
+                    <h2 class="fw-bold mb-4" th:text="${lesson.title}">Lesson Content</h2>
+                    <div class="text-muted" th:utext="${lesson.description}">Detailed lesson text goes here...</div>
+                </div>
+            </div>
+
+            <!-- Lesson Info Footer -->
+            <div class="p-4 bg-white border-top mt-auto">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1" th:text="${lesson.title}">1. Introduction to the Course</h4>
+                        <span class="text-muted small"><i class="far fa-clock me-2"></i>[[${lesson.durationMinutes}]] minutes</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form th:action="@{/student/progress/complete/{lid}(lid=${lesson.lessonId})}" method="post">
+                            <input type="hidden" name="courseId" th:value="${courseId}">
+                            <button type="submit" class="btn btn-success rounded-pill px-4" th:classappend="${progress != null && progress.isCompleted} ? 'disabled' : ''">
+                                <i class="fas fa-check-circle me-2"></i>Mark as Complete
+                            </button>
+                        </form>
+                        <a href="#" class="btn btn-outline-secondary rounded-pill px-4"><i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="fw-bold mb-3">About this lesson</h6>
+                        <p class="text-muted small" th:text="${lesson.description}">In this lesson, we will cover the basics of our course...</p>
+                    </div>
+                    <div class="col-md-4 border-start">
+                        <h6 class="fw-bold mb-3">Resources</h6>
+                        <div class="list-group list-group-flush">
+                            <a th:each="res : ${resources}" href="#" class="list-group-item list-group-item-action border-0 px-0 py-1 small text-primary">
+                                <i class="fas fa-file-download me-2"></i>Resource File.pdf
+                            </a>
+                            <div th:if="${resources == null || resources.length == 0}" class="text-muted small italic">No resources available</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden data for JS -->
+    <script th:inline="javascript">
+        const courseId = [[${courseId}]];
+        const lessonId = [[${lesson.lessonId}]];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('eduVideo');
+            if (video) {
+                // Tracking watch time every 30 seconds
+                setInterval(() => {
+                    if (!video.paused) {
+                        fetch('/student/progress/track', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.content || ""
+                            },
+                            body: JSON.stringify({
+                                courseId: courseId,
+                                lessonId: lessonId,
+                                watchedSeconds: Math.floor(video.currentTime)
+                            })
+                        });
+                    }
+                }, 30000);
+            }
+        });
+    </script>
+</section>
+</body>
+</html>
