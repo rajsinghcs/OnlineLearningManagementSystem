@@ -1,0 +1,14 @@
+com\edulearn\assessment\entity\Question.class
+com\edulearn\assessment\repository\QuestionRepository.class
+com\edulearn\assessment\resource\AssessmentResource.class
+com\edulearn\assessment\entity\Attempt.class
+com\edulearn\assessment\entity\Question$QuestionBuilder.class
+com\edulearn\assessment\exception\GlobalExceptionHandler.class
+com\edulearn\assessment\service\AssessmentService.class
+com\edulearn\assessment\entity\Attempt$AttemptBuilder.class
+com\edulearn\assessment\entity\Quiz$QuizBuilder.class
+com\edulearn\assessment\repository\AttemptRepository.class
+com\edulearn\assessment\service\impl\AssessmentServiceImpl.class
+com\edulearn\assessment\AssessmentServiceApplication.class
+com\edulearn\assessment\entity\Quiz.class
+com\edulearn\assessment\repository\QuizRepository.class
