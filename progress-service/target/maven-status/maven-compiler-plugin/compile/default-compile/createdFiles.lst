@@ -6,5 +6,6 @@ com\edulearn\progress\entity\Certificate$CertificateBuilder.class
 com\edulearn\progress\repository\ProgressRepository.class
 com\edulearn\progress\service\ProgressService.class
 com\edulearn\progress\ProgressApplication.class
+com\edulearn\progress\config\OpenApiConfig.class
 com\edulearn\progress\entity\Certificate.class
 com\edulearn\progress\entity\Progress.class
