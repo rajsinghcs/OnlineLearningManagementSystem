@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/courses")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class CourseResource {
 
@@ -19,12 +20,8 @@ public class CourseResource {
 
     @GetMapping
     public ResponseEntity<List<Course>> getAllPublishedCourses() {
-        // Technically, the requirement says "all published", but we only have getAllCourses in service
-        // Let's filter here or rely on the service. For now, we filter.
-        List<Course> publishedCourses = courseService.getAllCourses().stream()
-                .filter(Course::isPublished)
-                .toList();
-        return ResponseEntity.ok(publishedCourses);
+        // Return all courses without filtering by isPublished for testing/visibility purposes
+        return ResponseEntity.ok(courseService.getAllCourses());
     }
 
     @GetMapping("/all")

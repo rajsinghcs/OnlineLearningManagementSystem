@@ -49,14 +49,33 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
         try {
-            ResponseEntity<Double> revenue =
+            ResponseEntity<com.edulearn.web.dto.PaymentDTO[]> payments =
                 restTemplate.exchange(
-                    paymentUrl + "/payments/revenue",
+                    paymentUrl + "/payments/all",
                     HttpMethod.GET,
                     authHeaders(session),
-                    Double.class);
-            model.addAttribute("totalRevenue", revenue.getBody());
+                    com.edulearn.web.dto.PaymentDTO[].class);
+            
+            double totalRev = 0.0;
+            if (payments.getBody() != null) {
+                for (com.edulearn.web.dto.PaymentDTO p : payments.getBody()) {
+                    if ("SUCCESS".equalsIgnoreCase(p.getStatus())) {
+                        totalRev += p.getAmount();
+                    }
+                }
+            }
+            model.addAttribute("totalRevenue", totalRev);
         } catch (Exception e) { model.addAttribute("totalRevenue", 0.0); }
+
+        try {
+            ResponseEntity<com.edulearn.web.dto.UserDTO[]> users =
+                restTemplate.exchange(
+                    authUrl + "/auth/users?role=STUDENT",
+                    HttpMethod.GET,
+                    authHeaders(session),
+                    com.edulearn.web.dto.UserDTO[].class);
+            model.addAttribute("totalStudents", users.getBody() != null ? users.getBody().length : 0);
+        } catch (Exception e) { model.addAttribute("totalStudents", 0); }
 
         try {
             ResponseEntity<CourseDTO[]> allCourses =
@@ -298,6 +317,14 @@ public class AdminController {
             ResponseEntity<ThreadDTO[]> threads =
                 restTemplate.exchange(
                     discnotifUrl + "/threads/course/" + courseId,
+                    HttpMethod.GET,
+                    authHeaders(session),
+                    ThreadDTO[].class);
+            model.addAttribute("threads", threads.getBody());
+        } else {
+            ResponseEntity<ThreadDTO[]> threads =
+                restTemplate.exchange(
+                    discnotifUrl + "/threads",
                     HttpMethod.GET,
                     authHeaders(session),
                     ThreadDTO[].class);

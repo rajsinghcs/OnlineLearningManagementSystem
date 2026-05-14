@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/threads")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @Tag(name = "Discussion Forum", description = "Endpoints for forum threads and replies")
 public class DiscussionResource {
@@ -24,6 +25,12 @@ public class DiscussionResource {
     @Operation(summary = "Create a new thread")
     public ResponseEntity<DiscussionThread> createThread(@RequestBody DiscussionThread thread) {
         return ResponseEntity.status(HttpStatus.CREATED).body(discussionService.createThread(thread));
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all threads", description = "Returns all threads in the system (Admin use)")
+    public ResponseEntity<List<DiscussionThread>> getAllThreads() {
+        return ResponseEntity.ok(discussionService.getAllThreads());
     }
 
     @GetMapping("/course/{courseId}")
@@ -72,9 +79,12 @@ public class DiscussionResource {
     }
 
     @GetMapping("/replies/thread/{threadId}")
-    @Operation(summary = "Get replies for a thread")
-    public ResponseEntity<List<Reply>> getRepliesByThread(@PathVariable int threadId) {
-        return ResponseEntity.ok(discussionService.getRepliesByThread(threadId));
+    @Operation(summary = "Get replies for a thread", description = "Filters private replies based on viewer context")
+    public ResponseEntity<List<Reply>> getRepliesByThread(
+            @PathVariable int threadId,
+            @RequestParam(required = false) Integer viewerId,
+            @RequestParam(required = false) String viewerRole) {
+        return ResponseEntity.ok(discussionService.getRepliesByThread(threadId, viewerId, viewerRole));
     }
 
     @PutMapping("/replies/{replyId}/upvote")

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface EnrollmentService {
 
-    Enrollment enroll(int studentId, int courseId);
+    Enrollment enroll(int studentId, int courseId, String courseName);
 
     void unenroll(int enrollmentId);
 
@@ -24,4 +24,5 @@ public interface EnrollmentService {
 
     int getEnrollmentCount(int courseId);
 
+    long getTotalEnrollmentCount();
 }

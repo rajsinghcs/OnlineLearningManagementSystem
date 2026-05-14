@@ -5,6 +5,8 @@ import com.edulearn.discnotif.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +14,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notifications")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Notifications", description = "Endpoints for managing user notifications and alerts")
 public class NotificationResource {
 
@@ -27,9 +31,21 @@ public class NotificationResource {
 
     @PostMapping("/bulk")
     @Operation(summary = "Send notifications to multiple users (Admin)")
-    public ResponseEntity<Void> sendBulkNotification(@RequestParam List<Integer> userIds, @RequestParam String title, @RequestParam String message) {
-        notificationService.sendBulkNotification(userIds, title, message);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> sendBulkNotification(@RequestBody com.edulearn.discnotif.dto.BulkNotificationRequest request) {
+        log.info("Received bulk notification request: title={}, type={}, userCount={}", 
+            request.getTitle(), request.getType(), request.getUserIds() != null ? request.getUserIds().size() : 0);
+        
+        try {
+            if (request.getUserIds() == null || request.getUserIds().isEmpty()) {
+                return ResponseEntity.badRequest().body("User IDs list cannot be empty");
+            }
+            notificationService.sendBulkNotification(request.getUserIds(), request.getTitle(), request.getMessage(), request.getType());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Failed to send bulk notification", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to send bulk notification: " + e.getMessage());
+        }
     }
 
     @GetMapping("/user/{userId}")

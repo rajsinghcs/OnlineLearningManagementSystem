@@ -7,6 +7,9 @@ export const paymentApi = {
   getPaymentsByStudent: (studentId) =>
     paymentAxios.get(`/payments/student/${studentId}`),
 
+  getPaymentsByCourse: (courseId) =>
+    paymentAxios.get(`/payments/course/${courseId}`),
+
   getAllPayments: () =>
     paymentAxios.get('/payments/all'),
 
@@ -16,8 +19,14 @@ export const paymentApi = {
   refundPayment: (paymentId) =>
     paymentAxios.post(`/payments/${paymentId}/refund`),
 
-  subscribe: (data) =>
-    paymentAxios.post('/subscriptions', data),
+  subscribe: ({ studentId, planType, transactionId, mode }) =>
+    paymentAxios.post(`/subscriptions?studentId=${studentId}&plan=${planType}${transactionId ? `&transactionId=${transactionId}` : ''}${mode ? `&mode=${mode}` : ''}`, {}),
+
+  requestRefund: (subscriptionId) =>
+    paymentAxios.post(`/subscriptions/${subscriptionId}/request-refund`),
+
+  approveRefund: (paymentId) =>
+    paymentAxios.post(`/payments/${paymentId}/approve-refund`),
 
   cancelSubscription: (subscriptionId) =>
     paymentAxios.delete(`/subscriptions/${subscriptionId}`),

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { discnotifApi } from '../../api/discnotifApi';
 import useAuthStore from '../../store/authStore';
@@ -7,6 +8,7 @@ import useNotificationStore from '../../store/notificationStore';
 const NotificationBell = () => {
   const { user } = useAuthStore();
   const { unreadCount, setUnreadCount } = useNotificationStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.userId) {
@@ -25,11 +27,19 @@ const NotificationBell = () => {
     }
   }, [user?.userId, setUnreadCount]);
 
+  const handleClick = () => {
+    if (user?.role === 'ADMIN') {
+      navigate('/admin/notifications');
+    } else if (user?.role === 'STUDENT') {
+      navigate('/student/notifications');
+    }
+  };
+
   return (
-    <div className="relative cursor-pointer p-1 rounded-full hover:bg-gray-100 transition-colors">
-      <BellIcon className="h-6 w-6 text-gray-600" />
+    <div onClick={handleClick} className="relative cursor-pointer p-3 rounded-2xl bg-white/5 border border-white/10 hover:border-[#3b82f6]/50 hover:bg-white/10 transition-all group">
+      <BellIcon className="h-6 w-6 text-gray-400 group-hover:text-[#3b82f6] transition-colors" />
       {unreadCount > 0 && (
-        <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full border-2 border-white">
+        <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-[8px] font-black leading-none text-white transform bg-red-600 rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.5)]">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}

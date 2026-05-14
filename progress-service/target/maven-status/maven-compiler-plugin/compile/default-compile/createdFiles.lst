@@ -1,11 +1,9 @@
-com\edulearn\progress\resource\ProgressResource.class
 com\edulearn\progress\repository\CertificateRepository.class
+com\edulearn\progress\repository\ProgressRepository.class
+com\edulearn\progress\service\ProgressService.class
+com\edulearn\progress\entity\Progress.class
 com\edulearn\progress\entity\Progress$ProgressBuilder.class
 com\edulearn\progress\service\ProgressServiceImpl.class
 com\edulearn\progress\entity\Certificate$CertificateBuilder.class
-com\edulearn\progress\repository\ProgressRepository.class
-com\edulearn\progress\service\ProgressService.class
-com\edulearn\progress\ProgressApplication.class
 com\edulearn\progress\config\OpenApiConfig.class
 com\edulearn\progress\entity\Certificate.class
-com\edulearn\progress\entity\Progress.class

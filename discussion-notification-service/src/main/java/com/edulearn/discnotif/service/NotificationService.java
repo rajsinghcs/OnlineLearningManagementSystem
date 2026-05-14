@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface NotificationService {
     void sendNotification(Notification notification);
-    void sendBulkNotification(List<Integer> userIds, String title, String message);
+    void sendBulkNotification(List<Integer> userIds, String title, String message, String type);
     void markAsRead(int notificationId);
     void markAllRead(int userId);
     List<Notification> getByUser(int userId);

@@ -36,4 +36,7 @@ export const assessmentApi = {
 
   getBestScore: (studentId, quizId) =>
     assessmentAxios.get(`/attempts/best?studentId=${studentId}&quizId=${quizId}`),
+
+  resetAttempts: (quizId, studentId) =>
+    assessmentAxios.delete(`/attempts/quiz/${quizId}/student/${studentId}`),
 };

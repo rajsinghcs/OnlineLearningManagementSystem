@@ -23,8 +23,29 @@ export const authApi = {
     authAxios.get(`/auth/users${role ? `?role=${role}` : ''}`),
 
   suspendUser: (userId) =>
-    authAxios.put(`/auth/users/${userId}/suspend`),
+    authAxios.put(`/auth/suspend/${userId}`),
+
+  unsuspendUser: (userId) =>
+    authAxios.put(`/auth/unsuspend/${userId}`),
+
+  oauth2Login: (payload) =>
+    authAxios.post('/auth/oauth2/login', payload),
+
+  verifyInstructor: (userId) =>
+    authAxios.put(`/auth/verify/${userId}`),
+
+  approveInstructor: (userId) =>
+    authAxios.put(`/auth/admin/approve-instructor/${userId}`),
+
+  getPendingInstructors: () =>
+    authAxios.get('/auth/admin/pending-instructors'),
 
   deleteUser: (userId) =>
     authAxios.delete(`/auth/delete/${userId}`),
+
+  forgotPassword: (email) =>
+    authAxios.post('/auth/forgot-password', { email }),
+
+  resetPassword: (data) =>
+    authAxios.post('/auth/reset-password', data),
 };

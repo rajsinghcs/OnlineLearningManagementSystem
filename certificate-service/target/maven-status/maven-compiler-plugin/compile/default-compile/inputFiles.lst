@@ -1,0 +1,14 @@
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\util\QrCodeUtil.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\exception\CertificateRevokedException.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\repository\CertificateRepository.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\controller\CertificateController.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\exception\CertificateNotFoundException.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\dto\response\CertificateResponse.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\entity\Certificate.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\mapper\CertificateMapper.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\service\CertificatePdfService.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\CertificateServiceApplication.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\config\SwaggerConfig.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\service\CertificateService.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\exception\GlobalExceptionHandler.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\certificate-service\src\main\java\com\qm\certificate\dto\request\IssueCertificateRequest.java

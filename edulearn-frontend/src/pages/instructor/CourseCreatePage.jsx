@@ -33,7 +33,7 @@ const CourseCreatePage = () => {
       toast.success('Course created! Now add some lessons.');
       navigate(`/instructor/courses/${res.data.courseId}/lessons`);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create course');
+      toast.error(err.response?.data?.message || err.message || 'Failed to create course');
     } finally {
       setLoading(false);
     }
@@ -87,6 +87,8 @@ const CourseCreatePage = () => {
                   <option value="Business">Business</option>
                   <option value="Marketing">Marketing</option>
                   <option value="Data Science">Data Science</option>
+                  <option value="Music">Music</option>
+                  <option value="Health">Health</option>
                 </select>
                 {errors.category && <p className="mt-1 text-xs text-red-600 font-medium">{errors.category.message}</p>}
               </div>

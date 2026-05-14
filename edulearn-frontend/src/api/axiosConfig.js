@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import useAuthStore from '../store/authStore';
+
 const createAxiosInstance = (baseURL) => {
   const instance = axios.create({ baseURL });
 
@@ -20,9 +22,9 @@ const createAxiosInstance = (baseURL) => {
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
-        localStorage.removeItem('jwtToken');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+        // Clear auth state via store instead of hard redirect
+        // This allows ProtectedRoute to handle redirects while keeping public pages accessible
+        useAuthStore.getState().logout();
       }
       return Promise.reject(error);
     }
@@ -51,4 +53,10 @@ export const progressAxios = createAxiosInstance(
 );
 export const discnotifAxios = createAxiosInstance(
   import.meta.env.VITE_DISCNOTIF_SERVICE_URL
+);
+export const certificateAxios = createAxiosInstance(
+  import.meta.env.VITE_CERTIFICATE_SERVICE_URL || import.meta.env.VITE_AUTH_SERVICE_URL
+);
+export const aiAxios = createAxiosInstance(
+  import.meta.env.VITE_AI_SERVICE_URL
 );

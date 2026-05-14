@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/lessons")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class LessonResourceController { // Renamed from LessonResource to avoid naming conflict with Entity
 

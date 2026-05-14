@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class PaymentResource {
 
@@ -33,6 +34,16 @@ public class PaymentResource {
         return ResponseEntity.ok(paymentService.getPaymentsByCourse(courseId));
     }
 
+    @GetMapping("/payments/all")
+    public ResponseEntity<List<Payment>> getAllPayments() {
+        return ResponseEntity.ok(paymentService.getAllPayments());
+    }
+
+    @GetMapping("/subscriptions/all")
+    public ResponseEntity<List<Subscription>> getAllSubscriptions() {
+        return ResponseEntity.ok(paymentService.getAllSubscriptions());
+    }
+
     @GetMapping("/payments/revenue")
     public ResponseEntity<Double> getTotalRevenue() {
         return ResponseEntity.ok(paymentService.getTotalRevenue());
@@ -46,8 +57,22 @@ public class PaymentResource {
     // --- Subscriptions Endpoints ---
 
     @PostMapping("/subscriptions")
-    public ResponseEntity<Subscription> subscribe(@RequestParam int studentId, @RequestParam String plan) {
-        return new ResponseEntity<>(paymentService.subscribe(studentId, plan), HttpStatus.CREATED);
+    public ResponseEntity<Subscription> subscribe(
+            @RequestParam int studentId, 
+            @RequestParam String plan,
+            @RequestParam(required = false) String transactionId,
+            @RequestParam(required = false) String mode) {
+        return new ResponseEntity<>(paymentService.subscribe(studentId, plan, transactionId, mode), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/subscriptions/{subscriptionId}/request-refund")
+    public ResponseEntity<Payment> requestRefund(@PathVariable int subscriptionId) {
+        return ResponseEntity.ok(paymentService.requestRefund(subscriptionId));
+    }
+
+    @PostMapping("/payments/{paymentId}/approve-refund")
+    public ResponseEntity<Payment> approveRefund(@PathVariable int paymentId) {
+        return ResponseEntity.ok(paymentService.refundPayment(paymentId));
     }
 
     @DeleteMapping("/subscriptions/{subscriptionId}")

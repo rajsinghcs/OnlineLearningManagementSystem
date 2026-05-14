@@ -1,5 +1,6 @@
 package com.edulearn.progress.service;
 
+import com.edulearn.progress.dto.CourseProgressResponse;
 import com.edulearn.progress.entity.Certificate;
 import com.edulearn.progress.entity.Progress;
 import com.edulearn.progress.repository.CertificateRepository;
@@ -22,6 +23,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,8 +35,10 @@ public class ProgressServiceImpl implements ProgressService {
     private final ProgressRepository progressRepository;
     private final CertificateRepository certificateRepository;
     private final RestTemplate restTemplate;
+    private final NotificationProducer notificationProducer;
 
-    private static final String LESSON_SERVICE_URL = "http://localhost:8080/lessons/course/";
+    private static final String LESSON_SERVICE_URL = "http://COURSE-LESSON-SERVICE/lessons/course/";
+    private static final String ENROLLMENT_SERVICE_URL = "http://ENROLLMENT-SERVICE/enrollments/progress";
     private static final String CERTIFICATES_DIR = "./certificates/";
 
     @Override
@@ -67,25 +71,83 @@ public class ProgressServiceImpl implements ProgressService {
         progress.setCompletedAt(LocalDateTime.now());
         progress.setLastAccessedAt(LocalDateTime.now());
         progressRepository.save(progress);
+
+        // Sync with Enrollment Service
+        try {
+            int percentage = getCourseProgress(studentId, courseId);
+            String url = String.format("%s?studentId=%d&courseId=%d&percent=%d", 
+                ENROLLMENT_SERVICE_URL, studentId, courseId, percentage);
+            restTemplate.put(url, null);
+        } catch (Exception e) {
+            log.error("Failed to sync progress with enrollment-service", e);
+        }
     }
 
     @Override
     public int getCourseProgress(int studentId, int courseId) {
         try {
-            Object[] lessons = restTemplate.getForObject(LESSON_SERVICE_URL + courseId, Object[].class);
-            int totalLessons = lessons != null ? lessons.length : 0;
-
-            if (totalLessons == 0) {
-                return 0; // Prevent division by zero
+            // Get current lessons from course-lesson-service
+            Object[] lessonsArr = restTemplate.getForObject(LESSON_SERVICE_URL + courseId, Object[].class);
+            if (lessonsArr == null || lessonsArr.length == 0) {
+                return 0;
             }
+            
+            // Map lesson IDs to ensure we only count existing lessons
+            java.util.Set<Integer> currentLessonIds = new java.util.HashSet<>();
+            for (Object obj : lessonsArr) {
+                if (obj instanceof java.util.Map) {
+                    Map<String, Object> map = (Map<String, Object>) obj;
+                    currentLessonIds.add((Integer) map.get("lessonId"));
+                }
+            }
+            
+            if (currentLessonIds.isEmpty()) return 0;
 
-            int completedLessons = progressRepository.countByStudentIdAndCourseIdAndIsCompleted(studentId, courseId, true);
-            return (int) (((double) completedLessons / totalLessons) * 100);
+            // Get all progress for this user/course
+            List<Progress> userProgress = progressRepository.findByStudentIdAndCourseId(studentId, courseId);
+            
+            long completedCount = userProgress.stream()
+                    .filter(Progress::isCompleted)
+                    .filter(p -> currentLessonIds.contains(p.getLessonId()))
+                    .count();
+
+            return (int) (((double) completedCount / currentLessonIds.size()) * 100);
 
         } catch (Exception e) {
             log.error("Error fetching course lessons from lesson-service for courseId: {}", courseId, e);
-            return 0; // Return 0 if unable to calculate
+            return 0;
         }
+    }
+
+    @Override
+    public CourseProgressResponse getDetailedCourseProgress(int studentId, int courseId) {
+        int percentage = getCourseProgress(studentId, courseId);
+        
+        // We need to filter this too to match the percentage
+        Object[] lessonsArr = restTemplate.getForObject(LESSON_SERVICE_URL + courseId, Object[].class);
+        java.util.Set<Integer> currentLessonIds = new java.util.HashSet<>();
+        if (lessonsArr != null) {
+            for (Object obj : lessonsArr) {
+                if (obj instanceof java.util.Map) {
+                    Map<String, Object> map = (Map<String, Object>) obj;
+                    currentLessonIds.add((Integer) map.get("lessonId"));
+                }
+            }
+        }
+
+        List<Progress> progressList = progressRepository.findByStudentIdAndCourseId(studentId, courseId);
+        List<Integer> completedLessonIds = progressList.stream()
+                .filter(Progress::isCompleted)
+                .filter(p -> currentLessonIds.contains(p.getLessonId()))
+                .map(Progress::getLessonId)
+                .toList();
+
+        return CourseProgressResponse.builder()
+                .studentId(studentId)
+                .courseId(courseId)
+                .progressPercentage(percentage)
+                .completedLessonIds(completedLessonIds)
+                .build();
     }
 
     @Override
@@ -125,7 +187,24 @@ public class ProgressServiceImpl implements ProgressService {
                 .certificateUrl(filePath)
                 .build();
 
-        return certificateRepository.save(certificate);
+        Certificate savedCertificate = certificateRepository.save(certificate);
+
+        // Send Notification via RabbitMQ
+        try {
+            com.edulearn.progress.dto.NotificationDTO notification = com.edulearn.progress.dto.NotificationDTO.builder()
+                    .userId(studentId)
+                    .type("CERTIFICATE")
+                    .title("Congratulations! Course Completed")
+                    .message("You have successfully completed " + courseName + " and earned a certificate. Well done!")
+                    .relatedEntityId(courseId)
+                    .relatedEntityType("COURSE")
+                    .build();
+            notificationProducer.sendNotification(notification);
+        } catch (Exception e) {
+            log.error("Failed to send course completion notification", e);
+        }
+
+        return savedCertificate;
     }
 
     private String generatePdfCertificate(String studentName, String courseName, String instructorName, LocalDate issuedAt, String verificationCode, String fileName) {
@@ -197,6 +276,18 @@ public class ProgressServiceImpl implements ProgressService {
     public Certificate verifyCertificate(String verificationCode) {
         return certificateRepository.findByVerificationCode(verificationCode)
                 .orElseThrow(() -> new RuntimeException("Invalid verification code"));
+    }
+
+    @Override
+    public void syncProgress(int studentId, int courseId) {
+        try {
+            int percentage = getCourseProgress(studentId, courseId);
+            String url = String.format("%s?studentId=%d&courseId=%d&percent=%d", 
+                ENROLLMENT_SERVICE_URL, studentId, courseId, percentage);
+            restTemplate.put(url, null);
+        } catch (Exception e) {
+            log.error("Failed to manual sync progress with enrollment-service", e);
+        }
     }
 
     @Override

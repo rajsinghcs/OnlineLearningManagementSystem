@@ -48,8 +48,22 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Override
-    public List<Reply> getRepliesByThread(int threadId) {
-        return replyRepository.findByThreadId(threadId);
+    public List<Reply> getRepliesByThread(int threadId, Integer viewerId, String viewerRole) {
+        List<Reply> allReplies = replyRepository.findByThreadId(threadId);
+        
+        // If viewer is ADMIN, show everything
+        if ("ADMIN".equalsIgnoreCase(viewerRole)) {
+            return allReplies;
+        }
+
+        // Fetch thread owner to allow them to see private replies
+        DiscussionThread thread = threadRepository.findById(threadId).orElse(null);
+        int threadOwnerId = (thread != null) ? thread.getAuthorId() : -1;
+
+        return allReplies.stream()
+                .filter(reply -> !reply.isPrivate() || 
+                                (viewerId != null && (viewerId == reply.getAuthorId() || viewerId == threadOwnerId)))
+                .toList();
     }
 
     @Override
@@ -98,5 +112,10 @@ public class DiscussionServiceImpl implements DiscussionService {
     @Override
     public List<DiscussionThread> searchThreads(String keyword) {
         return threadRepository.searchByKeyword(keyword);
+    }
+
+    @Override
+    public List<DiscussionThread> getAllThreads() {
+        return threadRepository.findAll();
     }
 }

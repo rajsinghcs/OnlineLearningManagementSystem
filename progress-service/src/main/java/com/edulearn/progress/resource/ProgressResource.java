@@ -1,5 +1,6 @@
 package com.edulearn.progress.resource;
 
+import com.edulearn.progress.dto.CourseProgressResponse;
 import com.edulearn.progress.entity.Certificate;
 import com.edulearn.progress.entity.Progress;
 import com.edulearn.progress.service.ProgressService;
@@ -38,6 +39,18 @@ public class ProgressResource {
     public ResponseEntity<Integer> getCourseProgress(@PathVariable int studentId, @PathVariable int courseId) {
         int progress = progressService.getCourseProgress(studentId, courseId);
         return ResponseEntity.ok(progress);
+    }
+
+    @GetMapping("/progress/course-details/{studentId}/{courseId}")
+    public ResponseEntity<CourseProgressResponse> getDetailedCourseProgress(@PathVariable int studentId, @PathVariable int courseId) {
+        return ResponseEntity.ok(progressService.getDetailedCourseProgress(studentId, courseId));
+    }
+
+    @PostMapping("/progress/sync/{studentId}/{courseId}")
+    @Operation(summary = "Sync progress", description = "Recalculate and push progress to enrollment-service")
+    public ResponseEntity<Void> syncProgress(@PathVariable int studentId, @PathVariable int courseId) {
+        progressService.syncProgress(studentId, courseId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/progress/lesson/{studentId}/{lessonId}")

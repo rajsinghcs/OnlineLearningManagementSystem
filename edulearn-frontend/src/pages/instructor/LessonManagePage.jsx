@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
 import { lessonSchema } from '../../utils/validationSchemas';
@@ -13,7 +13,8 @@ import {
   PencilIcon,
   PlayCircleIcon,
   DocumentTextIcon,
-  Bars3Icon
+  Bars3Icon,
+  BookOpenIcon
 } from '@heroicons/react/24/outline';
 
 const LessonManagePage = () => {
@@ -26,13 +27,15 @@ const LessonManagePage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(lessonSchema),
     defaultValues: {
       contentType: 'VIDEO',
       durationMinutes: 10
     }
   });
+
+  const contentType = useWatch({ control, name: 'contentType' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +58,22 @@ const LessonManagePage = () => {
   const onAddLesson = async (data) => {
     setSubmitting(true);
     try {
-      const lessonData = { ...data, courseId: parseInt(courseId), orderNum: lessons.length + 1 };
+      let contentUrl = data.contentUrl;
+      
+      // If user pasted an iframe (common mistake), extract the src URL
+      if (contentUrl.includes('<iframe') && contentUrl.includes('src=')) {
+        const match = contentUrl.match(/src="([^"]+)"/);
+        if (match && match[1]) {
+          contentUrl = match[1];
+        }
+      }
+
+      const lessonData = { 
+        ...data, 
+        contentUrl: contentUrl.trim(),
+        courseId: parseInt(courseId), 
+        orderNum: lessons.length + 1 
+      };
       const res = await courseApi.addLesson(lessonData);
       setLessons([...lessons, res.data]);
       setIsAdding(false);
@@ -127,24 +145,48 @@ const LessonManagePage = () => {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Duration (minutes)</label>
-              <input 
-                {...register('durationMinutes')}
-                type="number"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
+            {contentType === 'VIDEO' && (
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Duration (minutes)</label>
+                <input 
+                  {...register('durationMinutes')}
+                  type="number"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500"
+                />
+              </div>
+            )}
 
-            <div className="col-span-full">
-              <label className="block text-sm font-bold text-gray-700 mb-1">Content URL / Video URL</label>
-              <input 
-                {...register('contentUrl')}
-                className={`w-full px-4 py-3 border ${errors.contentUrl ? 'border-red-300' : 'border-gray-200'} rounded-xl focus:ring-primary-500 focus:border-primary-500`}
-                placeholder="https://youtube.com/... or https://s3.amazon.com/..."
-              />
-              {errors.contentUrl && <p className="mt-1 text-xs text-red-600 font-medium">{errors.contentUrl.message}</p>}
-            </div>
+            {contentType === 'PDF' ? (
+              <div className="col-span-full">
+                <label className="block text-sm font-bold text-gray-700 mb-1">Upload PDF Document</label>
+                <input 
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setValue('contentUrl', URL.createObjectURL(file));
+                      toast.success('PDF selected successfully');
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-white"
+                />
+                <input type="hidden" {...register('contentUrl')} />
+                {errors.contentUrl && <p className="mt-1 text-xs text-red-600 font-medium">{errors.contentUrl.message}</p>}
+                <p className="mt-2 text-xs text-gray-500">Note: In a real application, this would upload to a cloud storage bucket. For now, it will generate a local preview URL.</p>
+              </div>
+            ) : (
+              <div className="col-span-full">
+                <label className="block text-sm font-bold text-gray-700 mb-1">Content URL / Video URL</label>
+                <input 
+                  {...register('contentUrl')}
+                  className={`w-full px-4 py-3 border ${errors.contentUrl ? 'border-red-300' : 'border-gray-200'} rounded-xl focus:ring-primary-500 focus:border-primary-500`}
+                  placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                />
+                <p className="mt-1 text-[10px] text-gray-400 font-medium">Paste the direct link. If you paste an embed code, we'll try to extract the link for you.</p>
+                {errors.contentUrl && <p className="mt-1 text-xs text-red-600 font-medium">{errors.contentUrl.message}</p>}
+              </div>
+            )}
 
             <div className="col-span-full flex justify-end space-x-4 pt-4 border-t border-gray-50">
               <button type="button" onClick={() => setIsAdding(false)} className="px-6 py-2 text-sm font-bold text-gray-600 hover:text-gray-900">Cancel</button>

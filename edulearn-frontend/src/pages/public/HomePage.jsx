@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { courseApi } from '../../api/courseApi';
 import CourseGrid from '../../components/course/CourseGrid';
-import { RocketLaunchIcon, BookOpenIcon, UserGroupIcon, TrophyIcon } from '@heroicons/react/24/outline';
+import { 
+  UsersIcon, 
+  BookOpenIcon, 
+  StarIcon, 
+  AcademicCapIcon, 
+  RocketLaunchIcon 
+} from '@heroicons/react/24/outline';
 
 const HomePage = () => {
   const [featuredCourses, setFeaturedCourses] = useState([]);
@@ -22,85 +28,92 @@ const HomePage = () => {
     fetchFeatured();
   }, []);
 
-  const stats = [
-    { name: 'Active Students', value: '50k+', icon: UserGroupIcon },
-    { name: 'Expert Courses', value: '1,200+', icon: BookOpenIcon },
-    { name: 'Certified Instructors', value: '450+', icon: TrophyIcon },
-    { name: 'Success Rate', value: '98%', icon: RocketLaunchIcon },
-  ];
-
   return (
-    <div className="space-y-20 pb-20">
+    <div className="sparkle-bg min-h-screen text-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-indigo-900 text-white py-24 px-4 overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-secondary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-700"></div>
-        
+      <div className="relative pt-32 pb-20 px-4 overflow-hidden">
+        {/* Ambient Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#3b82f6]/20 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-[#8b5cf6]/10 rounded-full blur-[120px]"></div>
+
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-tight">
-            Learn Anytime.<br /><span className="text-primary-400">Grow Everywhere.</span>
+          <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-6 py-2 rounded-full mb-10 backdrop-blur-md">
+            <span className="flex h-2 w-2 rounded-full bg-[#3b82f6]"></span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Next Generation Learning</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-10 italic uppercase">
+            Empower Your <br />
+            <span className="bg-gradient-to-r from-[#3b82f6] via-[#60a5fa] to-[#93c5fd] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+              Digital Brain _
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl text-primary-100 mb-10 max-w-3xl mx-auto font-light leading-relaxed">
-            Access world-class education from top experts. Master new skills, earn certificates, and advance your career with EduLearn.
+
+          <p className="max-w-2xl mx-auto text-xl text-gray-400 font-medium leading-relaxed mb-16 tracking-tight">
+            Master the most in-demand skills with our state-of-the-art AI-powered platform. Designed for the futuristic student.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <Link to="/courses" className="btn-primary py-4 px-10 text-lg rounded-full font-bold shadow-2xl hover:shadow-primary-500/20 transition-all transform hover:-translate-y-1">
-              Explore Courses
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Link to="/courses" className="btn-cyber py-5 px-16 text-sm">
+              Explore Modules
             </Link>
-            <Link to="/register" className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 py-4 px-10 text-lg rounded-full font-bold transition-all transform hover:-translate-y-1">
-              Start Teaching
+            <Link to="/register" className="btn-ghost py-5 px-16 text-sm">
+              Initiate Access
             </Link>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Stats Section */}
-      <section className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 py-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat) => (
-            <div key={stat.name} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-shadow group">
-              <stat.icon className="h-10 w-10 text-primary-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-500 font-medium uppercase tracking-wider">{stat.name}</div>
+          {[
+            { label: 'Active Nodes', value: '10K+', icon: UsersIcon },
+            { label: 'Course Modules', value: '500+', icon: BookOpenIcon },
+            { label: 'Elite Mentors', value: '200+', icon: StarIcon },
+            { label: 'Success Rate', value: '98%', icon: AcademicCapIcon },
+          ].map((stat) => (
+            <div key={stat.label} className="glass-card text-center group">
+              <div className="w-16 h-16 bg-[#3b82f6]/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                <stat.icon className="h-8 w-8 text-[#3b82f6]" />
+              </div>
+              <div className="text-4xl font-black mb-2 italic tracking-tighter">{stat.value}</div>
+              <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">{stat.label}</div>
             </div>
           ))}
         </div>
-      </section>
+      </div>
 
       {/* Featured Courses */}
-      <section className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-end mb-12">
+      <div className="max-w-7xl mx-auto px-4 py-20">
+        <div className="flex justify-between items-end mb-16">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Featured Courses</h2>
-            <p className="text-gray-500">Hand-picked courses by our education experts.</p>
+            <h2 className="text-4xl font-black uppercase italic tracking-tighter">Featured <span className="text-[#3b82f6]">Operations</span></h2>
+            <p className="text-gray-500 font-bold uppercase tracking-widest mt-2 text-xs">High-Intensity Learning Modules</p>
           </div>
-          <Link to="/courses" className="text-primary-600 font-bold flex items-center hover:text-primary-700">
-            View All <RocketLaunchIcon className="h-5 w-5 ml-2" />
-          </Link>
+          <Link to="/courses" className="text-[#3b82f6] font-black uppercase tracking-widest text-[10px] hover:underline italic">View All Modules</Link>
         </div>
+        
         <CourseGrid courses={featuredCourses} loading={loading} />
-      </section>
+      </div>
 
-      {/* Categories */}
-      <section className="bg-gray-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Top Categories</h2>
-            <p className="text-gray-400">Discover your next passion from our most popular topics.</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {['Development', 'Design', 'Business', 'Marketing', 'Data Science', 'Music'].map((cat) => (
-              <Link 
-                key={cat} 
-                to={`/courses?category=${cat}`}
-                className="bg-white/5 hover:bg-primary-600 border border-white/10 py-8 rounded-xl text-center transition-all group"
-              >
-                <div className="font-bold text-lg group-hover:scale-105 transition-transform">{cat}</div>
-              </Link>
-            ))}
+      {/* CTA Section */}
+      <div className="max-w-7xl mx-auto px-4 py-32">
+        <div className="glass-card relative overflow-hidden group p-20 text-center">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#3b82f6]/10 rounded-full blur-[100px]"></div>
+          <div className="relative z-10">
+            <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-8 leading-none">
+              Ready to <span className="text-[#3b82f6]">Upgrade</span> Your Future?
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto text-lg mb-12">
+              Join 10,000+ students mastering the digital frontier today.
+            </p>
+            <Link to="/register" className="btn-cyber py-5 px-20 text-sm">
+              Sign Up Now
+            </Link>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

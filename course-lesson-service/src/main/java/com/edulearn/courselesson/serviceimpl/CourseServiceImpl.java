@@ -70,6 +70,7 @@ public class CourseServiceImpl implements CourseService {
             throw new CourseNotApprovedException("Course must be approved before publishing");
         }
         course.setPublished(true);
+        course.setRejected(false);
         courseRepository.save(course);
     }
 
@@ -109,6 +110,7 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException("Course not found with id: " + courseId));
         course.setApproved(true);
+        course.setRejected(false);
         courseRepository.save(course);
     }
 
@@ -118,6 +120,7 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new CourseNotFoundException("Course not found with id: " + courseId));
         course.setApproved(false);
         course.setPublished(false);
+        course.setRejected(true);
         courseRepository.save(course);
     }
 

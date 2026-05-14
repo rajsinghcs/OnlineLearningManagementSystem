@@ -31,6 +31,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private com.edulearn.auth.service.MailService mailService;
+
     @Override
     public User register(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
@@ -43,14 +46,41 @@ public class AuthServiceImpl implements AuthService {
         if (user.getRole() == null || user.getRole().isEmpty()) {
             user.setRole("STUDENT");
         }
+
+        if ("INSTRUCTOR".equalsIgnoreCase(user.getRole())) {
+            user.setIsVerified(false);
+            user.setIsApproved(false);
+        } else if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+            user.setIsVerified(true);
+            user.setIsApproved(true);
+        } else {
+            user.setIsVerified(false);
+            user.setIsApproved(true); // Students don't need manual approval, just verification
+        }
+
+        user.setVerificationToken(java.util.UUID.randomUUID().toString());
         user.setCreatedAt(LocalDateTime.now());
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (!savedUser.getIsVerified()) {
+            mailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getVerificationToken());
+        }
+
+        return savedUser;
     }
 
     @Override
     public String login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+        if (Boolean.TRUE.equals(user.getIsSuspended())) {
+            throw new InvalidCredentialsException("Account is suspended. Please contact support.");
+        }
+
+        if (!Boolean.TRUE.equals(user.getIsVerified())) {
+            throw new InvalidCredentialsException("Email not verified. Please check your email.");
+        }
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new InvalidCredentialsException("Invalid password");
@@ -134,7 +164,112 @@ public class AuthServiceImpl implements AuthService {
         if (userDetails.getProfilePicUrl() != null) {
             existingUser.setProfilePicUrl(userDetails.getProfilePicUrl());
         }
+        if (userDetails.getLearningGoals() != null) {
+            existingUser.setLearningGoals(userDetails.getLearningGoals());
+        }
+        if (userDetails.getExpertiseAreas() != null) {
+            existingUser.setExpertiseAreas(userDetails.getExpertiseAreas());
+        }
         
         return userRepository.save(existingUser);
+    }
+
+    @Override
+    public String oauth2Login(String email, String fullName, String provider, String profilePicUrl) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User user;
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+            if (Boolean.TRUE.equals(user.getIsSuspended())) {
+                throw new InvalidCredentialsException("Account is suspended. Please contact support.");
+            }
+        } else {
+            // Auto register
+            user = new User();
+            user.setEmail(email);
+            user.setFullName(fullName);
+            user.setProvider(provider);
+            user.setProfilePicUrl(profilePicUrl);
+            user.setRole("STUDENT");
+            user.setIsVerified(true);
+            user.setIsSuspended(false);
+            // Generate a random password since it's OAuth2, but we need a hash
+            user.setPasswordHash(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+            user.setCreatedAt(LocalDateTime.now());
+            user = userRepository.save(user);
+        }
+        return jwtUtil.generateToken(user);
+    }
+
+    @Override
+    public void suspendUser(int userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
+        }
+        user.setIsSuspended(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unsuspendUser(int userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
+        }
+        user.setIsSuspended(false);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid or expired verification token"));
+        user.setIsVerified(true);
+        user.setVerificationToken(null);
+        userRepository.save(user);
+    }
+    @Override
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+        
+        String token = java.util.UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1));
+        userRepository.save(user);
+        
+        mailService.sendResetPasswordEmail(user.getEmail(), token);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetPasswordToken(token)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid or expired reset token"));
+        
+        if (user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new InvalidCredentialsException("Reset token has expired");
+        }
+        
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        user.setResetPasswordTokenExpiry(null);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void approveInstructor(int instructorId) {
+        User user = userRepository.findByUserId(instructorId);
+        if (user == null || !"INSTRUCTOR".equalsIgnoreCase(user.getRole())) {
+            throw new UserNotFoundException("Instructor not found with ID: " + instructorId);
+        }
+        user.setIsApproved(true);
+        userRepository.save(user);
+        mailService.sendApprovalNotification(user.getEmail());
+    }
+
+    @Override
+    public java.util.List<User> getPendingInstructors() {
+        return userRepository.findByRoleAndIsApprovedFalse("INSTRUCTOR");
     }
 }

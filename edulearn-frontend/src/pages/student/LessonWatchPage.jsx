@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import { courseApi } from '../../api/courseApi';
 import { progressApi } from '../../api/progressApi';
+import { assessmentApi } from '../../api/assessmentApi';
 import useAuthStore from '../../store/authStore';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { 
@@ -12,10 +13,13 @@ import {
   PlayIcon,
   DocumentTextIcon,
   ArrowDownTrayIcon,
-  ChatBubbleBottomCenterTextIcon
+  ChatBubbleBottomCenterTextIcon,
+  AcademicCapIcon,
+  PlayCircleIcon
 } from '@heroicons/react/24/solid';
 import { CheckCircleIcon as CheckCircleOutline } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import AiTutorChat from '../../components/course/AiTutorChat';
 
 const LessonWatchPage = () => {
   const { courseId, lessonId } = useParams();
@@ -26,24 +30,29 @@ const LessonWatchPage = () => {
   const [lessons, setLessons] = useState([]);
   const [currentLesson, setCurrentLesson] = useState(null);
   const [resources, setResources] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
   const [completedLessons, setCompletedLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState('RESOURCES'); // RESOURCES, QUIZZES
+  const [videoError, setVideoError] = useState(false);
 
   const playerRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [courseRes, lessonsRes, progressRes] = await Promise.all([
+        const [courseRes, lessonsRes, progressRes, quizzesRes] = await Promise.all([
           courseApi.getCourseById(courseId),
           courseApi.getLessonsByCourse(courseId),
-          progressApi.getCourseProgress(user.userId, courseId)
+          progressApi.getCourseProgress(user.userId, courseId).catch(() => ({ data: { completedLessonIds: [] } })),
+          assessmentApi.getQuizzesByCourse(courseId).catch(() => ({ data: [] }))
         ]);
         
         setCourse(courseRes.data);
         setLessons(lessonsRes.data);
         setCompletedLessons(progressRes.data.completedLessonIds || []);
+        setQuizzes(quizzesRes.data.filter(q => q.isPublished) || []);
 
         const lessonToWatch = lessonId !== '0' 
           ? lessonsRes.data.find(l => l.lessonId.toString() === lessonId)
@@ -157,25 +166,60 @@ const LessonWatchPage = () => {
 
         <div className="flex-grow overflow-y-auto custom-scrollbar bg-gray-50">
           {/* Player Container */}
-          <div className="w-full aspect-video bg-black shadow-2xl">
-            {currentLesson.contentType === 'VIDEO' ? (
-              <ReactPlayer 
-                ref={playerRef}
-                url={currentLesson.contentUrl}
-                width="100%"
-                height="100%"
-                controls
-                onProgress={handleProgress}
-                config={{ file: { attributes: { controlsList: 'nodownload' } } }}
-              />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-white space-y-4 p-10 text-center">
-                <DocumentTextIcon className="h-16 w-16 text-gray-400" />
-                <h3 className="text-2xl font-bold">Document Content</h3>
-                <p className="max-w-md text-gray-400">This lesson contains document content. Please read the materials below and mark the lesson as complete.</p>
-                <a href={currentLesson.contentUrl} target="_blank" rel="noreferrer" className="btn-primary px-8 py-3 rounded-full">Open Document</a>
-              </div>
-            )}
+          <div className="w-full aspect-video bg-black shadow-2xl relative">
+            {(() => {
+              const url = currentLesson.contentUrl || currentLesson.content_url;
+              if (!url) return <div className="p-20 text-center text-white">No content URL provided.</div>;
+
+              const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
+              const isVideo = currentLesson.contentType === 'VIDEO' || isYouTube;
+
+              if (!isVideo) {
+                return (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-white space-y-4 p-10 text-center">
+                    <DocumentTextIcon className="h-16 w-16 text-gray-400" />
+                    <h3 className="text-2xl font-bold">Document Content</h3>
+                    <p className="max-w-md text-gray-400">This lesson contains document content. Please read the materials below and mark the lesson as complete.</p>
+                    <a href={url} target="_blank" rel="noreferrer" className="btn-primary px-8 py-3 rounded-full">Open Document</a>
+                  </div>
+                );
+              }
+
+              // Handle YouTube separately for maximum reliability
+              if (isYouTube) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = url.match(regExp);
+                const videoId = (match && match[2].length === 11) ? match[2] : null;
+
+                if (videoId) {
+                  return (
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&origin=${window.location.origin}`}
+                      title="YouTube video player" 
+                      frameBorder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                      allowFullScreen
+                    ></iframe>
+                  );
+                }
+              }
+
+              // Fallback to ReactPlayer for other video types
+              return (
+                <ReactPlayer 
+                  ref={playerRef}
+                  url={url}
+                  width="100%"
+                  height="100%"
+                  controls
+                  onProgress={handleProgress}
+                  onError={() => setVideoError(true)}
+                  onReady={() => setVideoError(false)}
+                />
+              );
+            })()}
           </div>
 
           <div className="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
@@ -211,29 +255,72 @@ const LessonWatchPage = () => {
               </div>
 
               <div className="space-y-6">
-                <h3 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-2">Resources</h3>
-                <div className="space-y-3">
-                  {resources.map(res => (
-                    <a 
-                      key={res.resourceId}
-                      href={res.fileUrl} 
-                      target="_blank" 
-                      rel="noreferrer"
-                      className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 hover:border-primary-200 transition-colors group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <DocumentTextIcon className="h-5 w-5 text-gray-400 group-hover:text-primary-600" />
-                        <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{res.fileName}</span>
-                      </div>
-                      <ArrowDownTrayIcon className="h-4 w-4 text-gray-300 group-hover:text-primary-600" />
-                    </a>
-                  ))}
-                  {resources.length === 0 && <p className="text-xs text-gray-400 italic">No resources available.</p>}
+                <div className="flex border-b border-gray-100 mb-4">
+                  <button 
+                    onClick={() => setActiveTab('RESOURCES')}
+                    className={`pb-2 text-xs font-black uppercase tracking-widest transition-all border-b-2 mr-6 ${
+                      activeTab === 'RESOURCES' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-400 hover:text-gray-900'
+                    }`}
+                  >
+                    Resources
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('QUIZZES')}
+                    className={`pb-2 text-xs font-black uppercase tracking-widest transition-all border-b-2 ${
+                      activeTab === 'QUIZZES' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-400 hover:text-gray-900'
+                    }`}
+                  >
+                    Quizzes
+                  </button>
                 </div>
+
+                {activeTab === 'RESOURCES' ? (
+                  <div className="space-y-3">
+                    {resources.map(res => (
+                      <a 
+                        key={res.resourceId}
+                        href={res.fileUrl} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 hover:border-primary-200 transition-colors group"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <DocumentTextIcon className="h-5 w-5 text-gray-400 group-hover:text-primary-600" />
+                          <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{res.fileName}</span>
+                        </div>
+                        <ArrowDownTrayIcon className="h-4 w-4 text-gray-300 group-hover:text-primary-600" />
+                      </a>
+                    ))}
+                    {resources.length === 0 && <p className="text-xs text-gray-400 italic">No resources available.</p>}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {quizzes.map(quiz => (
+                      <Link 
+                        key={quiz.quizId}
+                        to={`/student/quiz/${quiz.quizId}`}
+                        className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 hover:border-primary-200 transition-colors group"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <AcademicCapIcon className="h-5 w-5 text-gray-400 group-hover:text-secondary-500" />
+                          <div>
+                            <div className="text-sm font-bold text-gray-700">{quiz.title}</div>
+                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                              {quiz.timeLimitMinutes} MINS • {quiz.maxAttempts} ATTEMPTS
+                            </div>
+                          </div>
+                        </div>
+                        <PlayIcon className="h-4 w-4 text-gray-300 group-hover:text-secondary-500" />
+                      </Link>
+                    ))}
+                    {quizzes.length === 0 && <p className="text-xs text-gray-400 italic">No quizzes available for this course.</p>}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
+        <AiTutorChat lesson={currentLesson} course={course} resources={resources} />
       </main>
     </div>
   );

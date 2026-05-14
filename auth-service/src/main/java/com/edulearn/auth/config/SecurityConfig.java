@@ -31,7 +31,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/register", "/auth/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/auth/register", "/auth/login", "/auth/verify-email", "/auth/forgot-password", "/auth/reset-password", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/auth/admin/**").hasRole("ADMIN")
                 .requestMatchers("/auth/delete/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

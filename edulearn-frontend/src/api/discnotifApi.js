@@ -4,6 +4,9 @@ export const discnotifApi = {
   createThread: (data) =>
     discnotifAxios.post('/threads', data),
 
+  getAllThreads: () =>
+    discnotifAxios.get('/threads'),
+
   getThreadsByCourse: (courseId) =>
     discnotifAxios.get(`/threads/course/${courseId}`),
 
@@ -23,19 +26,21 @@ export const discnotifApi = {
     discnotifAxios.put(`/threads/${threadId}/close`),
 
   postReply: (data) =>
-    discnotifAxios.post('/replies', data),
+    discnotifAxios.post('/threads/replies', data),
 
-  getRepliesByThread: (threadId) =>
-    discnotifAxios.get(`/replies/thread/${threadId}`),
+  getRepliesByThread: (threadId, viewerId, viewerRole) =>
+    discnotifAxios.get(`/threads/replies/thread/${threadId}`, {
+      params: { viewerId, viewerRole }
+    }),
 
   upvoteReply: (replyId) =>
-    discnotifAxios.put(`/replies/${replyId}/upvote`),
+    discnotifAxios.put(`/threads/replies/${replyId}/upvote`),
 
   acceptReply: (replyId) =>
-    discnotifAxios.put(`/replies/${replyId}/accept`),
+    discnotifAxios.put(`/threads/replies/${replyId}/accept`),
 
   deleteReply: (replyId) =>
-    discnotifAxios.delete(`/replies/${replyId}`),
+    discnotifAxios.delete(`/threads/replies/${replyId}`),
 
   sendNotification: (data) =>
     discnotifAxios.post('/notifications/send', data),

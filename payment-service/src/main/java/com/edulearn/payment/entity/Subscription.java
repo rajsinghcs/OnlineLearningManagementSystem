@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "subscriptions")
@@ -30,7 +31,7 @@ public class Subscription {
 
     private String plan; // FREE / MONTHLY / ANNUAL
 
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     private LocalDate endDate;
 

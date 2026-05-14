@@ -14,7 +14,9 @@ public interface PaymentService {
 
     List<Payment> getPaymentsByCourse(int courseId);
 
-    Subscription subscribe(int studentId, String plan);
+    Subscription subscribe(int studentId, String plan, String transactionId, String mode);
+
+    Payment requestRefund(int subscriptionId);
 
     void cancelSubscription(int subscriptionId);
 
@@ -27,4 +29,8 @@ public interface PaymentService {
     Payment refundPayment(int paymentId);
 
     Double getTotalRevenue();
+
+    List<Payment> getAllPayments();
+
+    List<Subscription> getAllSubscriptions();
 }

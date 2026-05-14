@@ -28,8 +28,8 @@ export const courseSchema = yup.object({
 export const lessonSchema = yup.object({
   title: yup.string().min(3, 'Min 3 characters').required('Title is required'),
   contentType: yup.string().oneOf(['VIDEO', 'ARTICLE', 'PDF', 'TEXT', 'EMBED']).required('Type is required'),
-  contentUrl: yup.string().required('Content URL is required'),
-  durationMinutes: yup.number().min(1, 'Min 1 min').required('Duration is required'),
+  contentUrl: yup.string().trim().required('Content URL is required'),
+  durationMinutes: yup.number().min(0, 'Min 0 min').default(0),
 });
 
 export const quizSchema = yup.object({

@@ -46,81 +46,81 @@ const CourseCatalogPage = () => {
   const levels = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <div className="flex flex-col lg:flex-row gap-10">
-        {/* Sidebar Filters */}
-        <aside className="w-full lg:w-64 space-y-8">
-          <div className="card p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
-              <FunnelIcon className="h-5 w-5 mr-2 text-primary-600" /> Filters
-            </h3>
-            
-            <form onSubmit={handleSearch} className="relative mb-8">
-              <input 
-                type="text" 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search courses..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-primary-500 focus:border-primary-500"
-              />
-              <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
-            </form>
+    <div className="bg-dark-bg min-h-screen text-white pb-32">
+      <div className="max-w-7xl mx-auto px-4 py-24">
+        <div className="flex flex-col lg:flex-row gap-16">
+          {/* Sidebar Filters */}
+          <aside className="w-full lg:w-96 space-y-12">
+            <div className="glass-card sticky top-32">
+              <h3 className="text-2xl font-black text-white mb-10 flex items-center uppercase italic tracking-tighter">
+                <FunnelIcon className="h-6 w-6 mr-4 text-[#3b82f6]" /> Filters <span className="text-[#3b82f6] ml-2">_</span>
+              </h3>
+              
+              <form onSubmit={handleSearch} className="relative mb-12">
+                <input 
+                  type="text" 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="SEARCH_DATA..."
+                  className="w-full pl-14 pr-6 py-5 bg-white/5 border border-white/10 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] focus:ring-1 focus:ring-[#3b82f6] focus:border-[#3b82f6] transition-all"
+                />
+                <MagnifyingGlassIcon className="h-5 w-5 text-gray-500 absolute left-5 top-5" />
+              </form>
 
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">Category</h4>
-                <div className="space-y-2">
-                  <button 
-                    onClick={() => setSearchParams({})}
-                    className={`block w-full text-left text-sm py-1.5 px-3 rounded-lg transition-colors ${!category ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
-                  >
-                    All Categories
-                  </button>
-                  {categories.map(cat => (
+              <div className="space-y-10">
+                <div>
+                  <h4 className="text-[10px] font-black text-gray-500 mb-6 uppercase tracking-[0.3em]">Operational Modules</h4>
+                  <div className="space-y-3">
                     <button 
-                      key={cat}
-                      onClick={() => setSearchParams({ category: cat })}
-                      className={`block w-full text-left text-sm py-1.5 px-3 rounded-lg transition-colors ${category === cat ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
+                      onClick={() => setSearchParams({})}
+                      className={`block w-full text-left text-[10px] font-black py-4 px-6 rounded-[1.2rem] transition-all uppercase tracking-widest italic ${!category ? 'bg-[#3b82f6]/10 text-[#3b82f6] border border-[#3b82f6]/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
                     >
-                      {cat}
+                      All Clusters
                     </button>
-                  ))}
+                    {categories.map(cat => (
+                      <button 
+                        key={cat}
+                        onClick={() => setSearchParams({ category: cat })}
+                        className={`block w-full text-left text-[10px] font-black py-4 px-6 rounded-[1.2rem] transition-all uppercase tracking-widest italic ${category === cat ? 'bg-[#3b82f6]/10 text-[#3b82f6] border border-[#3b82f6]/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <hr className="border-gray-100" />
-
-              <div>
-                <h4 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">Difficulty</h4>
-                <div className="space-y-2">
-                  {levels.map(l => (
-                    <button 
-                      key={l}
-                      onClick={() => setSearchParams({ level: l })}
-                      className={`block w-full text-left text-sm py-1.5 px-3 rounded-lg transition-colors ${level === l ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
-                    >
-                      {l.charAt(0) + l.slice(1).toLowerCase()}
-                    </button>
-                  ))}
+                <div className="border-t border-white/5 pt-10">
+                  <h4 className="text-[10px] font-black text-gray-500 mb-6 uppercase tracking-[0.3em]">Complexity Level</h4>
+                  <div className="space-y-3">
+                    {levels.map(l => (
+                      <button 
+                        key={l}
+                        onClick={() => setSearchParams({ level: l })}
+                        className={`block w-full text-left text-[10px] font-black py-4 px-6 rounded-[1.2rem] transition-all uppercase tracking-widest italic ${level === l ? 'bg-[#3b82f6]/10 text-[#3b82f6] border border-[#3b82f6]/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </aside>
+          </aside>
 
-        {/* Main Content */}
-        <main className="flex-grow">
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              {category ? `${category} Courses` : 'All Courses'}
-            </h2>
-            <p className="text-gray-500 mt-2">
-              Showing {courses.length} courses {search ? `for "${search}"` : ''}
-            </p>
-          </div>
+          {/* Main Content */}
+          <main className="flex-grow">
+            <div className="mb-16">
+              <h2 className="text-6xl font-black text-white tracking-tighter uppercase italic">
+                {category ? category : 'CENTRAL_HUB'} <span className="text-[#3b82f6]">_</span>
+              </h2>
+              <p className="text-gray-500 mt-6 text-sm font-black uppercase tracking-[0.2em] italic">
+                Available Nodes: {courses.length} {search ? `| SYNC_QUERY: "${search}"` : ''}
+              </p>
+            </div>
 
-          <CourseGrid courses={courses} loading={loading} />
-        </main>
+            <CourseGrid courses={courses} loading={loading} />
+          </main>
+        </div>
       </div>
     </div>
   );

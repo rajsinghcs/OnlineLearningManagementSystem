@@ -1,0 +1,5 @@
+{
+  "lessonTitle": "React State Management",
+  "lessonContent": "State is a built-in React object that is used to contain data or information about the component. A component's state can change over time; whenever it changes, the component re-renders.",
+  "studentQuestion": "Why does the component re-render when state changes?"
+}

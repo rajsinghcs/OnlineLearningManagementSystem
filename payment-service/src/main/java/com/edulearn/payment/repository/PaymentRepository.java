@@ -20,6 +20,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
     Optional<Payment> findByTransactionId(String transactionId);
 
+    Optional<Payment> findFirstByStudentIdAndCourseIdOrderByPaidAtDesc(int studentId, int courseId);
+
     @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.studentId = :studentId")
     Double sumAmountByStudentId(@Param("studentId") int studentId);
 

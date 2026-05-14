@@ -28,16 +28,19 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void sendBulkNotification(List<Integer> userIds, String title, String message) {
-        for (Integer userId : userIds) {
-            Notification notification = Notification.builder()
+    public void sendBulkNotification(List<Integer> userIds, String title, String message, String type) {
+        log.info("Preparing bulk notification for {} users", userIds.size());
+        List<Notification> notifications = userIds.stream().map(userId -> 
+            Notification.builder()
                     .userId(userId)
                     .title(title)
                     .message(message)
-                    .type("SYSTEM")
-                    .build();
-            sendNotification(notification);
-        }
+                    .type(type != null ? type : "SYSTEM")
+                    .build()
+        ).toList();
+        
+        notificationRepository.saveAll(notifications);
+        log.info("Bulk notification saved for {} users", userIds.size());
     }
 
     @Override
@@ -59,7 +62,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<Notification> getByUser(int userId) {
-        return notificationRepository.findByUserId(userId);
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     @Override

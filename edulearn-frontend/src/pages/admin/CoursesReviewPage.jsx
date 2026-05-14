@@ -21,7 +21,11 @@ const CoursesReviewPage = () => {
     const fetchCourses = async () => {
       try {
         const res = await courseApi.getAllCoursesAdmin();
-        setCourses(res.data);
+        const mappedCourses = res.data.map(c => ({
+          ...c,
+          status: c.published ? 'PUBLISHED' : (c.rejected ? 'REJECTED' : (c.approved ? 'APPROVED' : 'PENDING'))
+        }));
+        setCourses(mappedCourses);
       } catch (err) {
         toast.error('Failed to load courses');
       } finally {
@@ -34,8 +38,8 @@ const CoursesReviewPage = () => {
   const handleApprove = async (id) => {
     try {
       await courseApi.approveCourse(id);
-      setCourses(courses.map(c => c.courseId === id ? { ...c, status: 'PUBLISHED' } : u));
-      toast.success('Course approved and published');
+      setCourses(courses.map(c => c.courseId === id ? { ...c, status: 'APPROVED', approved: true } : c));
+      toast.success('Course approved');
     } catch (err) {
       toast.error('Approval failed');
     }
@@ -45,14 +49,19 @@ const CoursesReviewPage = () => {
     if (!window.confirm('Reject this course?')) return;
     try {
       await courseApi.rejectCourse(id);
-      setCourses(courses.map(c => c.courseId === id ? { ...c, status: 'REJECTED' } : u));
+      setCourses(courses.map(c => c.courseId === id ? { ...c, status: 'REJECTED' } : c));
       toast.success('Course rejected');
     } catch (err) {
       toast.error('Action failed');
     }
   };
 
-  const filteredCourses = filter === 'ALL' ? courses : courses.filter(c => c.status === (filter === 'PENDING' ? 'PENDING' : 'PUBLISHED' || c.status === 'REJECTED'));
+  const filteredCourses = filter === 'ALL' ? courses : courses.filter(c => {
+    if (filter === 'PENDING') return c.status === 'PENDING';
+    if (filter === 'PUBLISHED') return c.status === 'PUBLISHED' || c.status === 'APPROVED';
+    if (filter === 'REJECTED') return c.status === 'REJECTED';
+    return true;
+  });
 
   if (loading) return <LoadingSpinner />;
 
@@ -110,6 +119,7 @@ const CoursesReviewPage = () => {
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
                         course.status === 'PUBLISHED' ? 'text-green-600 bg-green-50' : 
+                        course.status === 'APPROVED' ? 'text-blue-600 bg-blue-50' : 
                         course.status === 'REJECTED' ? 'text-red-600 bg-red-50' : 'text-amber-600 bg-amber-50'
                       }`}>
                         {course.status}

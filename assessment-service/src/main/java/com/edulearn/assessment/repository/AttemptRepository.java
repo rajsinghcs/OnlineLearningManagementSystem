@@ -14,4 +14,5 @@ public interface AttemptRepository extends JpaRepository<Attempt, Integer> {
     List<Attempt> findByStudentIdAndQuizId(int studentId, int quizId);
     int countByStudentIdAndQuizId(int studentId, int quizId);
     Optional<Attempt> findTopByStudentIdAndQuizIdOrderByScoreDesc(int studentId, int quizId);
+    void deleteByQuizIdAndStudentId(int quizId, int studentId);
 }

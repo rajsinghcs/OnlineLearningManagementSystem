@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { courseApi } from '../../api/courseApi';
 import { enrollmentApi } from '../../api/enrollmentApi';
+import { paymentApi } from '../../api/paymentApi';
+import { discnotifApi } from '../../api/discnotifApi';
 import useAuthStore from '../../store/authStore';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import MockPaymentModal from '../../components/payment/MockPaymentModal';
 import { 
   PlayCircleIcon, 
   BookOpenIcon, 
@@ -14,6 +17,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { formatPrice, formatDuration, getLevelColor } from '../../utils/formatUtils';
 import toast from 'react-hot-toast';
 
@@ -27,6 +31,7 @@ const CourseDetailPage = () => {
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [expandedSection, setExpandedSection] = useState(null);
+  const [showMockPayment, setShowMockPayment] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,8 +44,15 @@ const CourseDetailPage = () => {
         setLessons(lessonsRes.data);
 
         if (isAuthenticated && user?.userId) {
-          const enrollmentRes = await enrollmentApi.isEnrolled(user.userId, courseId);
-          setIsEnrolled(enrollmentRes.data);
+          try {
+            const [enrollmentRes, subRes] = await Promise.all([
+              enrollmentApi.isEnrolled(user.userId, courseId).catch(() => ({ data: false })),
+              paymentApi.isSubscriptionActive(user.userId).catch(() => ({ data: false }))
+            ]);
+            setIsEnrolled(enrollmentRes.data || subRes.data);
+          } catch (e) {
+            console.error("Error checking enrollment status", e);
+          }
         }
       } catch (err) {
         console.error('Failed to fetch course details', err);
@@ -55,12 +67,106 @@ const CourseDetailPage = () => {
   if (loading) return <LoadingSpinner fullPage />;
   if (!course) return <div className="text-center py-20">Course not found.</div>;
 
+  const handlePaymentSuccess = async (response) => {
+    try {
+      const paymentData = {
+        studentId: user.userId,
+        courseId: courseId,
+        amount: course.price,
+        status: "SUCCESS",
+        mode: "RAZORPAY",
+        transactionId: response.razorpay_payment_id || `txn_${Date.now()}`
+      };
+      await paymentApi.processPayment(paymentData);
+
+      const enrollmentData = {
+        studentId: user.userId,
+        courseId: courseId,
+        courseName: course.title,
+        status: "ACTIVE"
+      };
+      await enrollmentApi.enroll(enrollmentData);
+
+      toast.success("Payment successful! You are now enrolled.");
+      navigate('/student/dashboard');
+    } catch (error) {
+      console.error("Error finalizing enrollment:", error);
+      toast.error("Payment received, but enrollment failed. Please contact support.");
+    }
+  };
+
   const handleEnrollClick = () => {
     if (!isAuthenticated) {
       navigate('/login', { state: { from: { pathname: `/courses/${courseId}` } } });
       return;
     }
-    navigate(`/student/checkout/${courseId}`);
+
+    if (!course.price || course.price <= 0) {
+      handleFreeEnrollment();
+      return;
+    }
+
+    if (!window.Razorpay) {
+      toast.error("Razorpay script not loaded. Falling back to mock payment.");
+      setShowMockPayment(true);
+      return;
+    }
+    
+    const options = {
+      key: "rzp_test_Sip4hhQ75N6HrV",
+      amount: course.price * 100, // Razorpay works in paise/cents
+      currency: "INR",
+      name: "EduLearn LMS",
+      description: `Enrollment for ${course.title}`,
+      image: "https://via.placeholder.com/150",
+      handler: handlePaymentSuccess,
+      prefill: {
+        name: user.fullName || "Student",
+        email: user.email || "student@example.com",
+        contact: "9999999999"
+      },
+      theme: {
+        color: "#4F46E5"
+      }
+    };
+    
+    const rzp = new window.Razorpay(options);
+    
+    rzp.on('payment.failed', function (response){
+      toast.error(`Payment failed: ${response.error.description}`);
+    });
+    
+    rzp.open();
+  };
+
+  const handleFreeEnrollment = async () => {
+    try {
+      const enrollmentData = {
+        studentId: user.userId,
+        courseId: courseId,
+        status: "ACTIVE"
+      };
+      await enrollmentApi.enroll(enrollmentData);
+
+      try {
+        await discnotifApi.sendNotification({
+          userId: user.userId,
+          type: "ENROLLMENT",
+          title: "Course Enrollment Successful",
+          message: `You have successfully enrolled in ${course.title}. Happy learning!`,
+          relatedEntityId: parseInt(courseId),
+          relatedEntityType: "COURSE"
+        });
+      } catch (notifErr) {
+        console.error("Failed to send notification:", notifErr);
+      }
+
+      toast.success("Successfully enrolled in free course!");
+      navigate('/student/dashboard');
+    } catch (error) {
+      console.error("Error enrolling in free course:", error);
+      toast.error("Failed to enroll. Please try again later.");
+    }
   };
 
   return (
@@ -82,8 +188,8 @@ const CourseDetailPage = () => {
                 <span className="text-sm font-medium">Verified Instructor: <span className="text-primary-400">{course.instructorName}</span></span>
               </div>
               <div className="flex items-center space-x-2">
-                <StarIcon className="h-5 w-5 text-accent-500" />
-                <span className="text-sm font-bold">4.8 (2,450 reviews)</span>
+                <StarIconSolid className="h-5 w-5 text-amber-500" />
+                <span className="text-sm font-bold">{course.averageRating || '0.0'} ({course.totalRatings || 0} reviews)</span>
               </div>
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getLevelColor(course.level)}`}>
                 {course.level}
@@ -101,14 +207,24 @@ const CourseDetailPage = () => {
               <div className="p-8 space-y-6">
                 <div className="text-4xl font-black">{formatPrice(course.price)}</div>
                 
-                {isEnrolled ? (
+                {user?.role === 'ADMIN' ? (
+                  <div className="bg-primary-50 border border-primary-100 text-primary-700 p-4 rounded-xl text-center font-bold text-sm">
+                    Viewing as Administrator
+                  </div>
+                ) : user?.role === 'INSTRUCTOR' ? (
+                  <div className="bg-secondary-50 border border-secondary-100 text-secondary-700 p-4 rounded-xl text-center font-bold text-sm">
+                    Viewing as Instructor
+                  </div>
+                ) : isEnrolled ? (
                   <Link to={`/student/learn/${courseId}/${lessons[0]?.lessonId}`} className="btn-primary w-full py-4 text-center block text-lg font-bold rounded-xl shadow-lg shadow-primary-500/30">
                     Continue Learning
                   </Link>
                 ) : (
-                  <button onClick={handleEnrollClick} className="btn-primary w-full py-4 text-lg font-bold rounded-xl shadow-lg shadow-primary-500/30">
-                    Enroll Now
-                  </button>
+                  <div className="space-y-3">
+                    <button onClick={handleEnrollClick} className="btn-primary w-full py-4 text-lg font-bold rounded-xl shadow-lg shadow-primary-500/30">
+                      Add Course
+                    </button>
+                  </div>
                 )}
 
                 <div className="space-y-3 text-sm text-gray-600 font-medium">
@@ -130,6 +246,13 @@ const CourseDetailPage = () => {
           </div>
         </div>
       </div>
+
+      <MockPaymentModal
+        isOpen={showMockPayment}
+        onClose={() => setShowMockPayment(false)}
+        course={course}
+        onSuccess={handlePaymentSuccess}
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 mt-20 lg:mt-32 grid grid-cols-1 lg:grid-cols-3 gap-16">

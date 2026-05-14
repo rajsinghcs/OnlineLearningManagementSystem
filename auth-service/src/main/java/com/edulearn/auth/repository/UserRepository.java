@@ -21,4 +21,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     void deleteByUserId(int userId);
 
     List<User> findByFullNameContaining(String name);
+
+    Optional<User> findByVerificationToken(String token);
+
+    Optional<User> findByResetPasswordToken(String token);
+
+    List<User> findByRoleAndIsApprovedFalse(String role);
 }

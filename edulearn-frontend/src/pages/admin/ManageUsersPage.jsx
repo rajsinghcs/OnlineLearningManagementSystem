@@ -6,7 +6,7 @@ import {
   UserPlusIcon, 
   TrashIcon, 
   MagnifyingGlassIcon,
-  FunnelIcon 
+  ShieldCheckIcon 
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { formatDate } from '../../utils/formatUtils';
@@ -31,13 +31,28 @@ const ManageUsersPage = () => {
     fetchUsers();
   }, []);
 
-  const handleSuspend = async (userId) => {
+  const handleSuspend = async (user) => {
     try {
-      await authApi.suspendUser(userId);
-      setUsers(users.map(u => u.userId === userId ? { ...u, status: u.status === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED' } : u));
-      toast.success('User status updated');
+      if (user.isSuspended) {
+        await authApi.unsuspendUser(user.userId);
+        toast.success('User unsuspended');
+      } else {
+        await authApi.suspendUser(user.userId);
+        toast.success('User suspended');
+      }
+      setUsers(users.map(u => u.userId === user.userId ? { ...u, isSuspended: !u.isSuspended } : u));
     } catch (err) {
       toast.error('Action failed');
+    }
+  };
+
+  const handleApprove = async (userId) => {
+    try {
+      await authApi.approveInstructor(userId);
+      setUsers(users.map(u => u.userId === userId ? { ...u, isApproved: true } : u));
+      toast.success('Instructor approved successfully');
+    } catch (err) {
+      toast.error('Approval failed');
     }
   };
 
@@ -123,18 +138,39 @@ const ManageUsersPage = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
-                      user.role === 'ADMIN' ? 'text-purple-600 bg-purple-50' : 
-                      user.role === 'INSTRUCTOR' ? 'text-secondary-600 bg-secondary-50' : 'text-blue-600 bg-blue-50'
-                    }`}>
-                      {user.role}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
+                        user.role === 'ADMIN' ? 'text-purple-600 bg-purple-50' : 
+                        user.role === 'INSTRUCTOR' ? 'text-secondary-600 bg-secondary-50' : 'text-blue-600 bg-blue-50'
+                      }`}>
+                        {user.role}
+                      </span>
+                      {user.role === 'INSTRUCTOR' && (
+                        <div className="flex flex-col gap-1">
+                          {!user.isVerified && (
+                            <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-yellow-100 text-yellow-800">
+                              Email Unverified
+                            </span>
+                          )}
+                          {!user.isApproved && (
+                            <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-orange-100 text-orange-800">
+                              Pending Approval
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {user.role === 'STUDENT' && !user.isVerified && (
+                        <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-yellow-100 text-yellow-800">
+                          Unverified
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
-                      user.status === 'SUSPENDED' ? 'text-red-600 bg-red-50' : 'text-green-600 bg-green-50'
+                      user.isSuspended ? 'text-red-600 bg-red-50' : 'text-green-600 bg-green-50'
                     }`}>
-                      {user.status || 'ACTIVE'}
+                      {user.isSuspended ? 'SUSPENDED' : 'ACTIVE'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-xs font-medium text-gray-500">
@@ -142,15 +178,26 @@ const ManageUsersPage = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {user.role === 'INSTRUCTOR' && !user.isApproved && (
+                        <button 
+                          onClick={() => handleApprove(user.userId)}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Approve Instructor"
+                        >
+                          <ShieldCheckIcon className="h-5 w-5" />
+                        </button>
+                      )}
                       <button 
-                        onClick={() => handleSuspend(user.userId)}
-                        className={`p-2 rounded-lg transition-colors ${user.status === 'SUSPENDED' ? 'text-green-600 hover:bg-green-50' : 'text-amber-600 hover:bg-amber-50'}`}
+                        onClick={() => handleSuspend(user)}
+                        className={`p-2 rounded-lg transition-colors ${user.isSuspended ? 'text-green-600 hover:bg-green-50' : 'text-amber-600 hover:bg-amber-50'}`}
+                        title={user.isSuspended ? "Unsuspend User" : "Suspend User"}
                       >
-                        {user.status === 'SUSPENDED' ? <UserPlusIcon className="h-5 w-5" /> : <UserMinusIcon className="h-5 w-5" />}
+                        {user.isSuspended ? <UserPlusIcon className="h-5 w-5" /> : <UserMinusIcon className="h-5 w-5" />}
                       </button>
                       <button 
                         onClick={() => handleDelete(user.userId)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete User"
                       >
                         <TrashIcon className="h-5 w-5" />
                       </button>

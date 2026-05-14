@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Certificate of Completion</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+            color: #333;
+            background-color: #fff;
+        }
+        .certificate-container {
+            width: 297mm;
+            height: 210mm;
+            padding: 20mm;
+            box-sizing: border-box;
+            position: relative;
+            background: #fff;
+        }
+        /* Gold double border */
+        .outer-border {
+            border: 5px double #b8860b;
+            height: 100%;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .inner-border {
+            border: 2px solid #b8860b;
+            height: 100%;
+            width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+            position: relative;
+            text-align: center;
+        }
+        /* Decorative corner accents */
+        .corner {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #b8860b;
+        }
+        .top-left { top: -5px; left: -5px; border-right: none; border-bottom: none; }
+        .top-right { top: -5px; right: -5px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: -5px; left: -5px; border-right: none; border-top: none; }
+        .bottom-right { bottom: -5px; right: -5px; border-left: none; border-top: none; }
+
+        .institution-name {
+            font-size: 1.2em;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .main-heading {
+            font-size: 3.5em;
+            color: #2c2c6c;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .sub-heading {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+        .student-name {
+            font-size: 3em;
+            font-style: italic;
+            color: #b8860b;
+            margin: 20px 0;
+            display: inline-block;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 5px;
+        }
+        .course-info {
+            font-size: 1.4em;
+            margin: 20px 0;
+        }
+        .course-name {
+            font-weight: bold;
+            color: #2c2c6c;
+        }
+        .meta-line {
+            font-size: 1.1em;
+            margin-top: 30px;
+            color: #666;
+        }
+        .meta-item {
+            display: inline-block;
+            margin: 0 15px;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #444;
+        }
+
+        /* Footer with 3 columns */
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            left: 50px;
+            right: 50px;
+            display: table;
+            width: calc(100% - 100px);
+        }
+        .footer-col {
+            display: table-cell;
+            vertical-align: bottom;
+            width: 33.33%;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 5px;
+            font-size: 1em;
+        }
+        .qr-code-section {
+            text-align: center;
+        }
+        .qr-code-img {
+            width: 100px;
+            height: 100px;
+        }
+        .verify-text {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 5px;
+        }
+        .cert-number-footer {
+            font-size: 0.8em;
+            color: #444;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+<div class="certificate-container">
+    <div class="outer-border">
+        <div class="inner-border">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+
+            <div class="institution-name">EduLearn Academy</div>
+            <div class="main-heading">CERTIFICATE</div>
+            <div class="sub-heading">OF COMPLETION</div>
+
+            <p class="course-info">This is to certify that</p>
+            <div class="student-name" th:text="${studentName}">Rahul Sharma</div>
+            <p class="course-info">has successfully completed the course</p>
+            <div class="course-name" th:text="${courseName}">Full Stack Java Development</div>
+
+            <div class="meta-line">
+                <div class="meta-item">
+                    <span class="meta-label">Grade:</span>
+                    <span th:text="${grade}">A+</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Issued On:</span>
+                    <span th:text="${issuedDate}">2024-05-05</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">ID:</span>
+                    <span th:text="${certNumber}">CERT-2024-00001</span>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="footer-col" style="text-align: left;">
+                    <div class="signature-line">Lead Instructor</div>
+                </div>
+                <div class="footer-col qr-code-section">
+                    <img class="qr-code-img" th:src="${qrCodeBase64}" alt="QR Code"/>
+                    <div class="verify-text">Scan to verify</div>
+                    <div class="cert-number-footer" th:text="${certNumber}">CERT-2024-00001</div>
+                </div>
+                <div class="footer-col" style="text-align: right;">
+                    <div class="signature-line">Director of Academy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

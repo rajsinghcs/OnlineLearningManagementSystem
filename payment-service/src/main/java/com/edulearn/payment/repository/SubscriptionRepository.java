@@ -2,6 +2,7 @@ package com.edulearn.payment.repository;
 
 import com.edulearn.payment.entity.Subscription;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -18,4 +19,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Inte
     List<Subscription> findByEndDateBefore(LocalDate date);
 
     Long countByPlan(String plan);
+
+    @Query("SELECT SUM(s.amountPaid) FROM Subscription s")
+    Double getTotalSubscriptionRevenue();
 }

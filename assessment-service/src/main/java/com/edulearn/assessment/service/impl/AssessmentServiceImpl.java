@@ -23,6 +23,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
     private final AttemptRepository attemptRepository;
+    private final org.springframework.web.client.RestTemplate restTemplate;
 
     @Override
     @Transactional
@@ -164,10 +165,47 @@ public class AssessmentServiceImpl implements AssessmentService {
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
         quiz.setIsPublished(true);
         quizRepository.save(quiz);
+
+        // Notify enrolled students via discussion-notification-service
+        try {
+            // 1. Get enrolled user IDs from enrollment-service
+            String enrollmentUrl = "http://ENROLLMENT-SERVICE/enrollments/course/" + quiz.getCourseId();
+            List<?> enrollments = restTemplate.getForObject(enrollmentUrl, List.class);
+            
+            if (enrollments != null && !enrollments.isEmpty()) {
+                java.util.List<Integer> studentIds = enrollments.stream()
+                        .map(e -> {
+                            Map<String, Object> map = (Map<String, Object>) e;
+                            return (Integer) map.get("studentId");
+                        })
+                        .toList();
+
+                // 2. Send bulk notification
+                String title = "New Quiz: " + quiz.getTitle();
+                String message = "A new quiz has been published in your course. Complete it to test your knowledge!";
+                
+                // Construct URL with query params for bulk notification
+                String userIdsStr = studentIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+                String notificationUrl = "http://DISCUSSION-NOTIFICATION-SERVICE/notifications/bulk?userIds=" + userIdsStr + 
+                        "&title=" + java.net.URLEncoder.encode(title, "UTF-8") + 
+                        "&message=" + java.net.URLEncoder.encode(message, "UTF-8");
+                
+                restTemplate.postForEntity(notificationUrl, null, Void.class);
+            }
+        } catch (Exception e) {
+            // Log error but don't fail the transaction (notification is secondary)
+            System.err.println("Failed to send quiz notifications: " + e.getMessage());
+        }
     }
 
     @Override
     public List<Question> getQuestionsByQuiz(int quizId) {
         return questionRepository.findByQuizIdOrderByOrderIndex(quizId);
+    }
+
+    @Override
+    @Transactional
+    public void resetAttempts(int quizId, int studentId) {
+        attemptRepository.deleteByQuizIdAndStudentId(quizId, studentId);
     }
 }

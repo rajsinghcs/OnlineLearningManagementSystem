@@ -79,4 +79,11 @@ export const courseApi = {
 
   countLessons: (courseId) =>
     courseAxios.get(`/lessons/count/${courseId}`),
+
+  // Rating APIs
+  submitRating: (data) =>
+    courseAxios.post('/courses/ratings', data),
+
+  getRatingByCourseAndStudent: (courseId, studentId) =>
+    courseAxios.get(`/courses/ratings/${courseId}/student/${studentId}`),
 };

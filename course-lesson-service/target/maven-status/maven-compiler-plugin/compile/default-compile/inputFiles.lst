@@ -1,12 +1,16 @@
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\resource\LessonResourceController.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\repository\RatingRepository.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\config\SwaggerConfig.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\repository\CourseRepository.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\entity\Course.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\resource\RatingResource.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\resource\CourseResource.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\service\CourseService.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\entity\Lesson.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\serviceimpl\RatingServiceImpl.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\config\SecurityConfig.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\exception\GlobalExceptionHandler.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\service\RatingService.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\CourseLessonServiceApplication.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\serviceimpl\LessonServiceImpl.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\exception\CourseNotApprovedException.java
@@ -16,4 +20,5 @@ C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-s
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\exception\LessonNotFoundException.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\repository\LessonResourceRepository.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\repository\LessonRepository.java
+C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\entity\Rating.java
 C:\OnlineLearningManagementSystem\OnlineLearningManagementSystem\course-lesson-service\src\main\java\com\edulearn\courselesson\service\LessonService.java

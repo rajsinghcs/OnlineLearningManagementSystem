@@ -44,6 +44,10 @@ const useAuthStore = create(
         return user?.userId;
       },
 
+      setUser: (userData) => {
+        set({ user: userData });
+      },
+
       isStudent: () => get().getRole() === 'STUDENT',
       isInstructor: () => get().getRole() === 'INSTRUCTOR',
       isAdmin: () => get().getRole() === 'ADMIN',

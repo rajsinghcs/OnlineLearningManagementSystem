@@ -11,14 +11,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/enrollments")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class EnrollmentResource {
 
     private final EnrollmentService enrollmentService;
 
     @PostMapping
-    public ResponseEntity<Enrollment> enroll(@RequestParam int studentId, @RequestParam int courseId) {
-        Enrollment enrollment = enrollmentService.enroll(studentId, courseId);
+    public ResponseEntity<Enrollment> enroll(
+            @RequestParam int studentId, 
+            @RequestParam int courseId,
+            @RequestParam(required = false) String courseName) {
+        Enrollment enrollment = enrollmentService.enroll(studentId, courseId, courseName);
         return new ResponseEntity<>(enrollment, HttpStatus.CREATED);
     }
 
@@ -64,5 +68,10 @@ public class EnrollmentResource {
     @GetMapping("/count/{courseId}")
     public ResponseEntity<Integer> getEnrollmentCount(@PathVariable int courseId) {
         return ResponseEntity.ok(enrollmentService.getEnrollmentCount(courseId));
+    }
+
+    @GetMapping("/total-count")
+    public ResponseEntity<Long> getTotalEnrollmentCount() {
+        return ResponseEntity.ok(enrollmentService.getTotalEnrollmentCount());
     }
 }

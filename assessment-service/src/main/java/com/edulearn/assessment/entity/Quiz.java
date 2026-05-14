@@ -21,6 +21,8 @@ public class Quiz {
     @Column(nullable = false)
     private Integer courseId;
 
+    private Integer lessonId;
+
     private String title;
 
     @Column(length = 1000)

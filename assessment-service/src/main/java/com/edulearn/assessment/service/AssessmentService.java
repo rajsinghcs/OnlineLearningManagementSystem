@@ -21,4 +21,5 @@ public interface AssessmentService {
     void deleteQuiz(int quizId);
     void publishQuiz(int quizId);
     List<Question> getQuestionsByQuiz(int quizId);
+    void resetAttempts(int quizId, int studentId);
 }

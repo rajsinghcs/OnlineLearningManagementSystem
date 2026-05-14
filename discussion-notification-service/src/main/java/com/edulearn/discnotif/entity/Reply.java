@@ -32,6 +32,10 @@ public class Reply {
     @Builder.Default
     private int upvotes = 0;
 
+    @Builder.Default
+    @com.fasterxml.jackson.annotation.JsonProperty("isPrivate")
+    private boolean isPrivate = false;
+
     private LocalDateTime createdAt;
 
     @PrePersist

@@ -10,7 +10,7 @@ public interface DiscussionService {
     Reply postReply(Reply reply);
     List<DiscussionThread> getThreadsByCourse(int courseId);
     List<DiscussionThread> getThreadsByLesson(int lessonId);
-    List<Reply> getRepliesByThread(int threadId);
+    List<Reply> getRepliesByThread(int threadId, Integer viewerId, String viewerRole);
     void upvoteReply(int replyId);
     void acceptReply(int replyId);
     void pinThread(int threadId);
@@ -18,4 +18,5 @@ public interface DiscussionService {
     void deleteThread(int threadId);
     void deleteReply(int replyId);
     List<DiscussionThread> searchThreads(String keyword);
+    List<DiscussionThread> getAllThreads();
 }

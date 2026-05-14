@@ -1,5 +1,6 @@
 package com.edulearn.progress.service;
 
+import com.edulearn.progress.dto.CourseProgressResponse;
 import com.edulearn.progress.entity.Certificate;
 import com.edulearn.progress.entity.Progress;
 
@@ -14,6 +15,8 @@ public interface ProgressService {
 
     int getCourseProgress(int studentId, int courseId);
 
+    CourseProgressResponse getDetailedCourseProgress(int studentId, int courseId);
+
     Optional<Progress> getLessonProgress(int studentId, int lessonId);
 
     Certificate issueCertificate(int studentId, int courseId);
@@ -21,6 +24,8 @@ public interface ProgressService {
     Optional<Certificate> getCertificate(int studentId, int courseId);
 
     Certificate verifyCertificate(String verificationCode);
+
+    void syncProgress(int studentId, int courseId);
 
     List<Progress> getAllProgressByStudent(int studentId);
 }

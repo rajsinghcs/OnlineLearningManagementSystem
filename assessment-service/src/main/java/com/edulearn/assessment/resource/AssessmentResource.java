@@ -86,4 +86,10 @@ public class AssessmentResource {
     public ResponseEntity<Integer> getBestScore(@RequestParam int studentId, @RequestParam int quizId) {
         return ResponseEntity.ok(assessmentService.getBestScore(studentId, quizId));
     }
+
+    @DeleteMapping("/attempts/quiz/{quizId}/student/{studentId}")
+    public ResponseEntity<Void> resetAttempts(@PathVariable int quizId, @PathVariable int studentId) {
+        assessmentService.resetAttempts(quizId, studentId);
+        return ResponseEntity.noContent().build();
+    }
 }

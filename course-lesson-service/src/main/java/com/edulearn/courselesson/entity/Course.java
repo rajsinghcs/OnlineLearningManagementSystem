@@ -37,10 +37,18 @@ public class Course {
     private int totalDuration; // total minutes
 
     private boolean isPublished = false;
-
+    
     private boolean isApproved = false;
+    
+    private boolean isRejected = false;
 
     private LocalDate createdAt;
 
     private String language;
+
+    @Column(columnDefinition = "double default 0.0")
+    private double averageRating = 0.0;
+
+    @Column(columnDefinition = "int default 0")
+    private int totalRatings = 0;
 }

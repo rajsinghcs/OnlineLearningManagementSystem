@@ -2,7 +2,7 @@ import { enrollmentAxios } from './axiosConfig';
 
 export const enrollmentApi = {
   enroll: (data) =>
-    enrollmentAxios.post('/enrollments', data),
+    enrollmentAxios.post(`/enrollments?studentId=${data.studentId}&courseId=${data.courseId}${data.courseName ? `&courseName=${data.courseName}` : ''}`),
 
   unenroll: (enrollmentId) =>
     enrollmentAxios.delete(`/enrollments/${enrollmentId}`),
@@ -27,4 +27,7 @@ export const enrollmentApi = {
 
   getEnrollmentCount: (courseId) =>
     enrollmentAxios.get(`/enrollments/count/${courseId}`),
+
+  getTotalEnrollmentCount: () =>
+    enrollmentAxios.get('/enrollments/total-count'),
 };
